@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+
+        <Description>Finds the path to an installed game from its name</Description>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+        <RootNamespace>Nitrox.Discovery</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="PolySharp" Version="1.13.1" PrivateAssets="all"/>
+        <PackageReference Include="System.Memory" Version="4.5.4" />
+    </ItemGroup>
+</Project>

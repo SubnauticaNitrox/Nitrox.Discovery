@@ -1,0 +1,10 @@
+<Project>
+    <PropertyGroup>
+        <Authors>Nitrox Team</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/SubnauticaNitrox/Nitrox.Discovery</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <VersionPrefix>0.0.1</VersionPrefix>
+        <VersionSuffix>dev</VersionSuffix>
+    </PropertyGroup>
+</Project>

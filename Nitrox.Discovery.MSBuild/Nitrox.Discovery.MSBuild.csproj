@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <DebugType>embedded</DebugType>
+
+        <Description>MSBuild integration for Nitrox.Discovery</Description>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <DevelopmentDependency>true</DevelopmentDependency>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <GenerateDependencyFile>true</GenerateDependencyFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.*"/>
+        <ProjectReference Include="..\Nitrox.Discovery\Nitrox.Discovery.csproj" />
+
+        <PackageReference Include="PolySharp" Version="1.13.1" PrivateAssets="all"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="$(MSBuildProjectName).props" Pack="true" PackagePath="build"/>
+    </ItemGroup>
+
+    <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+        <ItemGroup>
+            <_PackageFiles Include="bin\$(Configuration)\*\Nitrox.Discovery.dll">
+                <PackagePath>lib%(RecursiveDir)</PackagePath>
+                <Visible>false</Visible>
+                <BuildAction>Content</BuildAction>
+            </_PackageFiles>
+        </ItemGroup>
+    </Target>
+
+    <!-- This target adds the generated deps.json file to our package output -->
+    <Target
+            Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput"
+            BeforeTargets="BuiltProjectOutputGroup"
+            Condition=" '$(GenerateDependencyFile)' == 'true'">
+
+        <ItemGroup>
+            <BuiltProjectOutputGroupOutput
+                    Include="$(ProjectDepsFilePath)"
+                    TargetPath="$(ProjectDepsFileName)"
+                    FinalOutputPath="$(ProjectDepsFilePath)" />
+        </ItemGroup>
+    </Target>
+</Project>
