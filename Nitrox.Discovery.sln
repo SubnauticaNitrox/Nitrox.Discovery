@@ -9,6 +9,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionFolder", "{386B7990-DC95-45CE-9126-DE5E23638D45}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Global

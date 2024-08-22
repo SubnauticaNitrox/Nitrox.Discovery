@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <_NitroxDiscovery_TaskFolder Condition="'$(MSBuildRuntimeType)' == 'Core'">netstandard2.1</_NitroxDiscovery_TaskFolder>
+        <_NitroxDiscovery_TaskFolder Condition="'$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_NitroxDiscovery_TaskFolder>
         <_NitroxDiscovery_TaskFolder Condition="'$(MSBuildRuntimeType)' != 'Core'">net472</_NitroxDiscovery_TaskFolder>
         <_NitroxDiscovery_TaskAssembly>$(MSBuildThisFileDirectory)..\lib\$(_NitroxDiscovery_TaskFolder)\$(MSBuildThisFileName).dll</_NitroxDiscovery_TaskAssembly>
     </PropertyGroup>
