@@ -28,7 +28,7 @@ internal static class RegistryEx
 
         try
         {
-            object value = baseKey.GetValue(valueKey);
+            object? value = baseKey.GetValue(valueKey);
             if (value == null)
             {
                 return defaultValue;
@@ -54,7 +54,7 @@ internal static class RegistryEx
     public static bool Delete(string pathWithOptionalValue)
     {
         (RegistryKey? key, string? valueKey) = GetKey(pathWithOptionalValue);
-        if (key == null || string.IsNullOrEmpty(valueKey))
+        if (key == null || valueKey == null)
         {
             return false;
         }
@@ -138,7 +138,7 @@ internal static class RegistryEx
             baseKey?.Dispose();
             return false;
         }
-        object value = baseKey.GetValue(valueKey);
+        object? value = baseKey.GetValue(valueKey);
         if (value == null)
         {
             baseKey.Dispose();

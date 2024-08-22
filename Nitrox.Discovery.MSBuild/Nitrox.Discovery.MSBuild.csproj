@@ -29,7 +29,7 @@
 
     <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
         <ItemGroup>
-            <_PackageFiles Include="bin\$(Configuration)\*\Nitrox.Discovery.dll;bin\$(Configuration)\*\Microsoft.Win32.Registry.dll">
+            <_PackageFiles Include="bin\$(Configuration)\*\Nitrox.Discovery.dll">
                 <PackagePath>lib%(RecursiveDir)</PackagePath>
                 <Visible>false</Visible>
                 <BuildAction>Content</BuildAction>

@@ -4,7 +4,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/SubnauticaNitrox/Nitrox.Discovery</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <VersionPrefix>0.0.2</VersionPrefix>
+        <VersionPrefix>0.0.3</VersionPrefix>
         <VersionSuffix Condition="'$(Configuration)' == 'Debug'">dev</VersionSuffix>
     </PropertyGroup>
 </Project>
