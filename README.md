@@ -19,7 +19,7 @@ Discovers the path to an installed game from a given game name.
     <!-- Load any references to game DLLs here -->
     <ItemGroup>
         <Reference Include="MyGameDll">
-            <HintPath>$(GameDir)\bin\MyGameDll.dll</HintPath>
+            <HintPath>$(GameDir)bin\MyGameDll.dll</HintPath>
         </Reference>
     </ItemGroup>
 </Target>
