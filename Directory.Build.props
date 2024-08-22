@@ -5,6 +5,6 @@
         <RepositoryUrl>https://github.com/SubnauticaNitrox/Nitrox.Discovery</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <VersionPrefix>0.0.1</VersionPrefix>
-        <VersionSuffix>dev</VersionSuffix>
+        <VersionSuffix Condition="'$(Configuration)' == 'Debug'">dev</VersionSuffix>
     </PropertyGroup>
 </Project>
