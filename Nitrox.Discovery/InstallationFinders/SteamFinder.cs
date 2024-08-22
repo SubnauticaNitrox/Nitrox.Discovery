@@ -57,6 +57,10 @@ public sealed class SteamFinder : IGameFinder
 
     private static int GetSteamAppIdFromAcfFileMatchingGameName(string rootDirectory, string gameName)
     {
+        if (!Directory.Exists(rootDirectory))
+        {
+            return -1;
+        }
         foreach (string acfFile in Directory.EnumerateFiles(rootDirectory, "appmanifest_*.acf", SearchOption.TopDirectoryOnly))
         {
             var props = ExtractPropertiesFromXcfFile(acfFile, tuple => tuple.key.ToLowerInvariant() is "appid" or "name").ToDictionary(t => t.key, t => t.value);
