@@ -14,7 +14,7 @@ Discovers the path to an installed game from a given game name.
     <PropertyGroup>
         <GameDir>$(GameDir)\</GameDir>
     </PropertyGroup>
-    <Message Importance="high" Text="Game found at: '$(GameDir)' with version @(GameVersion)" />
+    <Message Importance="high" Text="Game found at: '$(GameDir)'" />
     
     <!-- Load any references to game DLLs here -->
     <ItemGroup>
