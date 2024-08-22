@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
 
@@ -15,4 +15,13 @@
         <PackageReference Include="PolySharp" Version="1.13.1" PrivateAssets="all"/>
         <PackageReference Include="System.Memory" Version="4.5.4" />
     </ItemGroup>
+
+    <!-- Conditional dependencies based on target framework -->
+    <Choose>
+        <When Condition="'$(TargetFramework)' == 'netstandard2.0'">
+            <ItemGroup>
+                <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+            </ItemGroup>
+        </When>
+    </Choose>
 </Project>
