@@ -8,32 +8,42 @@
 
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <DevelopmentDependency>true</DevelopmentDependency>
-        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <GenerateDependencyFile>true</GenerateDependencyFile>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+
+        <!-- This target will run when MSBuild is collecting the files to be packaged, and we'll implement it below. This property controls the dependency list for this packaging process, so by adding our custom property we hook ourselves into the process in a supported way. -->
+        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+        <!-- This property tells MSBuild where the root folder of the package's build assets should be. Because we are not a library package, we should not pack to 'lib'. Instead, we choose 'tasks' by convention. -->
+        <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
+        <!-- NuGet does validation that libraries in a package are exposed as dependencies, but we _explicitly_ do not want that behavior for MSBuild tasks. They are isolated by design. Therefore we ignore this specific warning. -->
+        <NoWarn>NU5100</NoWarn>
+        <!-- Suppress NuGet warning NU5128. -->
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.*"/>
-        <ProjectReference Include="..\Nitrox.Discovery\Nitrox.Discovery.csproj" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*" PrivateAssets="all" ExcludeAssets="Runtime" />
+        <ProjectReference Include="..\Nitrox.Discovery\Nitrox.Discovery.csproj" PrivateAssets="all" />
 
         <PackageReference Include="PolySharp" Version="1.13.1" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="$(MSBuildProjectName).props" Pack="true" PackagePath="build"/>
+        <None Include="$(MSBuildProjectName).props" Pack="true" PackagePath="build\" />
         <None Include="..\README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
-    <Target Name="PackTaskDependencies" BeforeTargets="GenerateNuspec">
+    <!-- This is the target we defined above. It's purpose is to add all of our PackageReference and ProjectReference's runtime assets to our package output.  -->
+    <Target
+            Name="CopyProjectReferencesToPackage"
+            DependsOnTargets="ResolveReferences">
         <ItemGroup>
-            <_PackageFiles Include="bin\$(Configuration)\*\Nitrox.Discovery.dll">
-                <PackagePath>lib%(RecursiveDir)</PackagePath>
-                <Visible>false</Visible>
-                <BuildAction>Content</BuildAction>
-            </_PackageFiles>
+            <!-- The TargetPath is the path inside the package that the source file will be placed. This is already precomputed in the ReferenceCopyLocalPaths items' DestinationSubPath, so reuse it here. -->
+            <BuildOutputInPackage
+                    Include="@(ReferenceCopyLocalPaths)"
+                    TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
         </ItemGroup>
     </Target>
 
