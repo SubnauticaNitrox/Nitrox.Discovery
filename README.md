@@ -6,20 +6,37 @@ Discovers the path to an installed game from a given game name.
 
 ### Use with msbuild
 ```xml
-<Target Name="FindGameAndIncludeReferences" BeforeTargets="ResolveAssemblyReferences">
-    <DiscoverGame GameName="MY_GAME" IntermediateOutputPath="$(IntermediateOutputPath)">
+<Target Name="FindGameAndIncludeReferences" BeforeTargets="ResolveAssemblyReferences" Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''">
+    <PropertyGroup>
+        <!-- Change this (optional: can be put in your Directory.Build.props file) -->
+        <GameName>MY_GAME</GameName>
+    </PropertyGroup>
+    <DiscoverGame GameName="$(GameName)" IntermediateOutputPath="$(IntermediateOutputPath)">
         <Output TaskParameter="GamePath" PropertyName="GameDir" />
     </DiscoverGame>
-    <Error Condition="'$(GameDir)' == ''" Text="Failed to find the game 'MY_GAME' on your machine" />
+    <Error Condition="'$(GameDir)' == ''" Text="Failed to find the game '$(GameName)' on your machine" />
     <PropertyGroup>
         <GameDir>$(GameDir)\</GameDir>
     </PropertyGroup>
+    <!-- Optional: do other checks on game (e.g. version check) -->
     <Message Importance="high" Text="Game found at: '$(GameDir)'" />
     
     <!-- Load any references to game DLLs here -->
     <ItemGroup>
         <Reference Include="MyGameDll">
             <HintPath>$(GameDir)bin\MyGameDll.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+</Target>
+```
+^ `Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''"` is needed so Visual Studio can still load Nuget packages and not fail on "DiscoverGame task not found". Otherwise, you need to run `dotnet restore` before opening solution in Visual Studio.
+
+### If you want to have game references resolved, customized for a project.csproj, add this to it
+```xml
+<Target Name="MoreGameReferences" AfterTargets="FindGameAndIncludeReferences">
+    <ItemGroup>
+        <Reference Include="SomeOtherGameDll">
+            <HintPath>$(GameDir)bin\SomeOtherGameDll.dll</HintPath>
         </Reference>
     </ItemGroup>
 </Target>

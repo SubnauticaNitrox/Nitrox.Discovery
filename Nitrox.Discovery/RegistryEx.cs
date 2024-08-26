@@ -216,21 +216,27 @@ internal static class RegistryEx
             return (null, null);
         }
         path = path!.Trim();
-
         // Parse path to get the registry key instance and the name of the .
-        Span<string> parts = path.Split(Path.DirectorySeparatorChar);
-        Span<string> partsWithoutHive;
+        string[] parts = path.Split(Path.DirectorySeparatorChar);
+        if (path.Length <= 1)
+        {
+            return (null, null);
+        }
+
+        string[] partsWithoutHive;
         RegistryHive hive = RegistryHive.CurrentUser;
         string regPathWithoutHiveOrKey;
         if (path.IndexOf("Computer", StringComparison.OrdinalIgnoreCase) < 0)
         {
-            partsWithoutHive = parts[..^1];
-            regPathWithoutHiveOrKey = string.Join(Path.DirectorySeparatorChar.ToString(), partsWithoutHive.ToArray());
+            partsWithoutHive = new string[parts.Length - 1];
+            Array.Copy(parts, partsWithoutHive, partsWithoutHive.Length);
+            regPathWithoutHiveOrKey = string.Join(Path.DirectorySeparatorChar.ToString(), partsWithoutHive);
         }
         else
         {
-            partsWithoutHive = parts[2..^1];
-            regPathWithoutHiveOrKey = string.Join(Path.DirectorySeparatorChar.ToString(), partsWithoutHive.ToArray());
+            partsWithoutHive = new string[parts.Length - 3];
+            Array.Copy(parts, 2, partsWithoutHive, 0, partsWithoutHive.Length);
+            regPathWithoutHiveOrKey = string.Join(Path.DirectorySeparatorChar.ToString(), partsWithoutHive);
             hive = parts[1].ToLowerInvariant() switch
             {
                 "hkey_classes_root" => RegistryHive.ClassesRoot,
