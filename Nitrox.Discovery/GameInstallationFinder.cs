@@ -104,7 +104,8 @@ public sealed class GameInstallationFinder
             {
                 if (entry.GetPathDepth(directory!) - 1 > maxDepth)
                 {
-                    continue;
+                    // "EnumerateFileSystemEntries" will do breath-first-search so we can break as soon as we hit depth limit.
+                    break;
                 }
                 if (!Path.GetExtension(entry).Equals(".exe", StringComparison.OrdinalIgnoreCase))
                 {
