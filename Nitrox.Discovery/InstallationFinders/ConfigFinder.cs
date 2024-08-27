@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using Nitrox.Discovery.InstallationFinders.Core;
-using static Nitrox.Discovery.InstallationFinders.Core.GameFinderResult;
 
 namespace Nitrox.Discovery.InstallationFinders;
 
@@ -8,9 +8,9 @@ namespace Nitrox.Discovery.InstallationFinders;
 /// </summary>
 internal sealed class ConfigFinder : IGameFinder
 {
-    public GameFinderResult FindGame(GameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(GameInfo gameInfo)
     {
         // TODO: Read from cached location
-        return NotFound();
+        yield break;
     }
 }

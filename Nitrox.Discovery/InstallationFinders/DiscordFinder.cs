@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Nitrox.Discovery.InstallationFinders.Core;
-using static Nitrox.Discovery.InstallationFinders.Core.GameFinderResult;
 
 namespace Nitrox.Discovery.InstallationFinders;
 
@@ -11,21 +11,11 @@ namespace Nitrox.Discovery.InstallationFinders;
 /// </summary>
 public sealed class DiscordFinder : IGameFinder
 {
-    public GameFinderResult FindGame(GameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(GameInfo gameInfo)
     {
         string localAppdataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-        string path = Path.Combine(localAppdataDirectory, "DiscordGames", gameInfo.Name, "content");
-        if (path.IsDirectoryWithTopLevelExecutable())
-        {
-            return Ok(path);
-        }
-        path = Path.Combine("C:", "Games", gameInfo.Name, "content");
-        if (path.IsDirectoryWithTopLevelExecutable())
-        {
-            return Ok(path);
-        }
-
-        return NotFound();
+        yield return Path.Combine(localAppdataDirectory, "DiscordGames", gameInfo.Name, "content");
+        yield return Path.Combine("C:\\", "Games", gameInfo.Name, "content");
     }
 }

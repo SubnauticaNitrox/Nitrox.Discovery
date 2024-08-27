@@ -34,6 +34,7 @@ public class DiscoverGameTest
         //Assert
         Assert.IsTrue(success);
         Assert.AreEqual(0, errors.Count);
+        Assert.AreNotEqual("", task.GamePath);
         Console.WriteLine(task.GamePath);
     }
 }

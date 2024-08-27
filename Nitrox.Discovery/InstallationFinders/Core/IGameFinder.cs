@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Nitrox.Discovery.InstallationFinders.Core;
 
 internal interface IGameFinder
@@ -7,5 +9,5 @@ internal interface IGameFinder
     /// </summary>
     /// <param name="gameInfo">Game to search for.</param>
     /// <returns>Nullable game installation</returns>
-    GameFinderResult FindGame(GameInfo gameInfo);
+    IEnumerable<FinderResult> FindGame(GameInfo gameInfo);
 }

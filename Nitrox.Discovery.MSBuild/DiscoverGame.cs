@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -13,6 +14,16 @@ public class DiscoverGame : Task
 {
     [Required]
     public string GameName { get; set; }
+
+    /// <summary>
+    ///     Name of the game executable without the exe extension.
+    /// </summary>
+    public string ExeName { get; set; } = "";
+
+    /// <summary>
+    ///     Relative depth to search within the game root for the game executable.
+    /// </summary>
+    public int ExeSearchDepth { get; set; } = 0;
 
     [Required]
     public string IntermediateOutputPath { get; set; }
@@ -40,10 +51,12 @@ public class DiscoverGame : Task
         }
 
         // Refresh cache
-        GameFinderResult finderResult = GameInstallationFinder.Instance.FindGame(new GameInfo
+        FinderResult finderResult = GameInstallationFinder.Instance.FindGame(new GameInfo
         {
-            Name = GameName
-        }).FirstOrDefault(r => r.IsOk);
+            Name = GameName,
+            ExeName = ExeName?.EndsWith(".exe") == true ? ExeName.Remove(ExeName.Length - 4) : ExeName ?? "",
+            ExeSearchDepth = Math.Max(0, ExeSearchDepth),
+        }).FirstOrDefault(r => string.IsNullOrWhiteSpace(r.ErrorMessage) && !string.IsNullOrWhiteSpace(r.Path));
         GamePath = finderResult?.Path ?? "";
         StoreGamePath(GamePath);
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Nitrox.Discovery.InstallationFinders.Core;
-using static Nitrox.Discovery.InstallationFinders.Core.GameFinderResult;
+using static Nitrox.Discovery.InstallationFinders.Core.FinderResult;
 
 namespace Nitrox.Discovery.InstallationFinders;
 
@@ -18,12 +18,12 @@ public sealed class SteamFinder : IGameFinder
 {
     private static readonly Regex xcfPropertyLineRegex = new(@"""([^""]*)""\s*""([^""]*)""");
 
-    public GameFinderResult FindGame(GameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(GameInfo gameInfo)
     {
         string? steamPath = GetSteamPath();
         if (string.IsNullOrEmpty(steamPath))
         {
-            return Error("Steam is not installed");
+            yield return Error("Steam is not installed");
         }
 
         string appsPath = Path.Combine(steamPath, "steamapps");
@@ -39,7 +39,7 @@ public sealed class SteamFinder : IGameFinder
             path = SearchAllInstallations(Path.Combine(appsPath, "libraryfolders.vdf"), gameInfo.Name);
             if (string.IsNullOrWhiteSpace(path))
             {
-                return NotFound();
+                yield break;
             }
         }
 
@@ -47,12 +47,7 @@ public sealed class SteamFinder : IGameFinder
         {
             path = Path.Combine(path, $"{gameInfo.Name}.app", "Contents");
         }
-        if (path?.IsDirectoryWithTopLevelExecutable() != true)
-        {
-            return Error($"Path '{path}' known by Steam for '{gameInfo.Name}' does not point to a valid game file structure");
-        }
-
-        return Ok(path);
+        yield return path;
     }
 
     private static int GetSteamAppIdFromAcfFileMatchingGameName(string rootDirectory, string gameName)
@@ -138,7 +133,6 @@ public sealed class SteamFinder : IGameFinder
             {
                 homePath = Environment.GetEnvironmentVariable("HOME");
             }
-
             if (!Directory.Exists(homePath))
             {
                 return null;

@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using System.IO;
 using Nitrox.Discovery.InstallationFinders.Core;
-using static Nitrox.Discovery.InstallationFinders.Core.GameFinderResult;
+using static Nitrox.Discovery.InstallationFinders.Core.FinderResult;
 
 namespace Nitrox.Discovery.InstallationFinders;
 
@@ -10,29 +11,23 @@ namespace Nitrox.Discovery.InstallationFinders;
 /// </summary>
 public sealed class MicrosoftFinder : IGameFinder
 {
-    public GameFinderResult FindGame(GameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(GameInfo gameInfo)
     {
+        string[] logicalDrives = [];
         try
         {
             // TODO: Read the user defined path from MS Store app
-            foreach (string logicalDrive in Directory.GetLogicalDrives())
-            {
-                string path = Path.Combine(logicalDrive, "XboxGames", gameInfo.Name, "Content");
-                if (path.IsDirectoryWithTopLevelExecutable())
-                {
-                    return Ok(path);
-                }
-            }
+            logicalDrives = Directory.GetLogicalDrives();
         }
         catch
         {
-            string path = Path.Combine("C:\\", "XboxGames", gameInfo.Name, "Content");
-            if (path.IsDirectoryWithTopLevelExecutable())
-            {
-                return Ok(path);
-            }
+            // ignored
         }
 
-        return NotFound();
+        foreach (string logicalDrive in logicalDrives)
+        {
+            yield return Path.Combine(logicalDrive, "XboxGames", gameInfo.Name, "Content");
+        }
+        yield return Path.Combine("C:\\", "XboxGames", gameInfo.Name, "Content");
     }
 }

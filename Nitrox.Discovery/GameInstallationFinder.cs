@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using Nitrox.Discovery.InstallationFinders;
 using Nitrox.Discovery.InstallationFinders.Core;
 using Nitrox.Discovery.Models;
@@ -31,7 +32,7 @@ public sealed class GameInstallationFinder
     /// <param name="gameInfo">Info object of a game.</param>
     /// <param name="gameLibraries">Known game libraries to search through</param>
     /// <returns>Positive and negative results from the search</returns>
-    public IEnumerable<GameFinderResult> FindGame(GameInfo gameInfo, GameLibraries gameLibraries = GameLibraries.ALL)
+    public IEnumerable<FinderResult> FindGame(GameInfo gameInfo, GameLibraries gameLibraries = GameLibraries.ALL)
     {
         Debug.Assert(gameInfo is not null);
         if (gameInfo is null || !gameLibraries.IsDefined())
@@ -46,19 +47,84 @@ public sealed class GameInstallationFinder
                 continue;
             }
 
-            GameFinderResult result = finder.FindGame(gameInfo);
-            if (!result.IsOk && string.IsNullOrWhiteSpace(result.ErrorMessage))
+            bool finderHasResult = false;
+            foreach (FinderResult? item in finder.FindGame(gameInfo))
             {
-                result = result with { ErrorMessage = $"It appears you don't have {gameInfo.Name} installed" };
+                if (item is null)
+                {
+                    continue;
+                }
+                FinderResult result = item;
+                if (result.ErrorMessage is not null)
+                {
+                    yield return result;
+                    finderHasResult = true;
+                    break;
+                }
+                if (!PathHasExecutable(result.Path, gameInfo.ExeName, gameInfo.ExeSearchDepth))
+                {
+                    continue;
+                }
+
+                finderHasResult = true;
+                yield return result with { Origin = wantedFinder, Path = PrettifyPath(result.Path!) };
+                break;
             }
-            if (result.Origin == default)
+
+            if (!finderHasResult)
             {
-                result = result with { Origin = wantedFinder };
-            }
-            if (result is { IsOk: true, Path: not null })
-            {
-                yield return result with { Path = Path.GetFullPath(result.Path) };
+                yield return new FinderResult
+                {
+                    FinderName = finder.GetType().Name,
+                    Origin = wantedFinder,
+                    ErrorMessage = $"It appears you don't have {gameInfo.Name} installed"
+                };
             }
         }
     }
+
+    private static bool PathHasExecutable(string? directory, string executableNameOrEmpty, int maxDepth = 0)
+    {
+        if (maxDepth < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(maxDepth), maxDepth, $"The {nameof(maxDepth)} must be a positive number.");
+        }
+        if (executableNameOrEmpty is null)
+        {
+            throw new ArgumentNullException(nameof(executableNameOrEmpty));
+        }
+        if (!Directory.Exists(directory))
+        {
+            return false;
+        }
+
+        try
+        {
+            foreach (string? entry in Directory.EnumerateFileSystemEntries(directory, "*", SearchOption.AllDirectories))
+            {
+                if (entry.GetPathDepth(directory!) - 1 > maxDepth)
+                {
+                    continue;
+                }
+                if (!Path.GetExtension(entry).Equals(".exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                if (executableNameOrEmpty != "" && !executableNameOrEmpty.Equals(Path.GetFileNameWithoutExtension(entry), StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                return true;
+            }
+        }
+        catch
+        {
+            return false;
+        }
+
+        return false;
+    }
+
+    private static string PrettifyPath(string path) => Path.GetFullPath(path);
 }

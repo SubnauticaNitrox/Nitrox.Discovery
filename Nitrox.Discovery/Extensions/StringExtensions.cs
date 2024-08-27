@@ -1,19 +1,29 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System;
+using System.IO;
 
 namespace Nitrox.Discovery.Extensions;
 
 internal static class StringExtensions
 {
-    public static bool IsDirectoryWithTopLevelExecutable(this string path)
+    /// <summary>
+    ///     Gets the relative distance between two paths where the first parameter is a subdirectory of the basePah.
+    /// </summary>
+    /// <returns>-1 if basePath is not the base, or a positive number if path is a subdirectory to basePath.</returns>
+    public static int GetPathDepth(this string path, string basePath)
     {
-        try
+        path = Path.GetFullPath(path).ToLowerInvariant();
+        basePath = Path.GetFullPath(basePath).ToLowerInvariant();
+        if (!path.StartsWith(basePath, StringComparison.Ordinal))
         {
-            return Directory.EnumerateFileSystemEntries(path, "*.exe", SearchOption.TopDirectoryOnly).Any();
+            return -1;
         }
-        catch
+        int depth = 0;
+        while (!path.Equals(basePath, StringComparison.Ordinal) && path != "")
         {
-            return false;
+            path = Path.GetDirectoryName(path) ?? "";
+            depth++;
         }
+
+        return path == "" ? -1 : depth;
     }
 }
