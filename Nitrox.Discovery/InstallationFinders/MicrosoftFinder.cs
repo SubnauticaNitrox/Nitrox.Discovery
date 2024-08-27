@@ -12,12 +12,27 @@ public sealed class MicrosoftFinder : IGameFinder
 {
     public GameFinderResult FindGame(GameInfo gameInfo)
     {
-        string path = Path.Combine("C:", "XboxGames", gameInfo.Name, "Content");
-        if (!path.IsDirectoryWithTopLevelExecutable())
+        try
         {
-            return Error($"Game installation directory '{path}' is invalid. Please enter the path to the '{gameInfo.Name}' installation");
+            // TODO: Read the user defined path from MS Store app
+            foreach (string logicalDrive in Directory.GetLogicalDrives())
+            {
+                string path = Path.Combine(logicalDrive, "XboxGames", gameInfo.Name, "Content");
+                if (path.IsDirectoryWithTopLevelExecutable())
+                {
+                    return Ok(path);
+                }
+            }
+        }
+        catch
+        {
+            string path = Path.Combine("C:\\", "XboxGames", gameInfo.Name, "Content");
+            if (path.IsDirectoryWithTopLevelExecutable())
+            {
+                return Ok(path);
+            }
         }
 
-        return Ok(path);
+        return NotFound();
     }
 }

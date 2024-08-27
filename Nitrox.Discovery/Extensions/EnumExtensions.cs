@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Nitrox.Discovery.Extensions;
 
-public static class EnumExtensions
+internal static class EnumExtensions
 {
     /// <summary>
     ///     Gets only the unique flags of the given enum value that aren't part of a different flag in the same enum type, excluding the 0 flag.
