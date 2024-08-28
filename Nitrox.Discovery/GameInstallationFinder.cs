@@ -23,7 +23,7 @@ public sealed class GameInstallationFinder
         { GameLibraries.EPIC, new EpicGamesFinder() },
         { GameLibraries.DISCORD, new DiscordFinder() },
         { GameLibraries.MICROSOFT, new MicrosoftFinder() },
-        { GameLibraries.CONFIG, new ConfigFinder() }
+        { GameLibraries.GOG, new GogFinder() },
     };
 
     /// <summary>

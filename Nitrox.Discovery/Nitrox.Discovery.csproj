@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
         <LangVersion>latest</LangVersion>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
 
         <Description>Finds the path to an installed game from its name</Description>
 

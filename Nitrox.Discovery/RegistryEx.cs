@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Win32;
@@ -18,9 +19,9 @@ internal static class RegistryEx
     /// <param name="defaultValue">The default value if the registry key is not found or failed to convert to <see cref="T" />.</param>
     /// <typeparam name="T">Type of value to read. If the value in the registry key does not match it will try to convert.</typeparam>
     /// <returns>Value as read from registry or null if not found.</returns>
-    public static T? Read<T>(string pathWithValue, T? defaultValue = default)
+    public static T Read<T>(string pathWithValue, T defaultValue = default)
     {
-        (RegistryKey? baseKey, string? valueKey) = GetKey(pathWithValue, false);
+        (RegistryKey baseKey, string valueKeyName) = GetKey(pathWithValue, false);
         if (baseKey == null)
         {
             return defaultValue;
@@ -28,7 +29,7 @@ internal static class RegistryEx
 
         try
         {
-            object? value = baseKey.GetValue(valueKey);
+            object value = baseKey.GetValue(valueKeyName);
             if (value == null)
             {
                 return defaultValue;
@@ -46,6 +47,28 @@ internal static class RegistryEx
         }
     }
 
+    public static string[] GetSubKeyNames(string path)
+    {
+        (RegistryKey baseKey, string valueKeyName) = GetKey(path, false);
+        if (baseKey == null)
+        {
+            return [];
+        }
+        try
+        {
+            using var target = baseKey.OpenSubKey(valueKeyName, false);
+            return target?.GetSubKeyNames() ?? [];
+        }
+        catch
+        {
+            return [];
+        }
+        finally
+        {
+            baseKey.Dispose();
+        }
+    }
+
     /// <summary>
     ///     Deletes the whole subtree or value, whichever exists.
     /// </summary>
@@ -53,7 +76,7 @@ internal static class RegistryEx
     /// <returns>True if something was deleted.</returns>
     public static bool Delete(string pathWithOptionalValue)
     {
-        (RegistryKey? key, string? valueKey) = GetKey(pathWithOptionalValue);
+        (RegistryKey key, string valueKey) = GetKey(pathWithOptionalValue);
         if (key == null || valueKey == null)
         {
             return false;
@@ -89,7 +112,7 @@ internal static class RegistryEx
         {
             throw new ArgumentNullException(nameof(value));
         }
-        (RegistryKey? baseKey, string? valueKey) = GetKey(pathWithKey, true, true);
+        (RegistryKey baseKey, string valueKey) = GetKey(pathWithKey, true, true);
         if (baseKey == null)
         {
             return;
@@ -132,13 +155,12 @@ internal static class RegistryEx
     /// </summary>
     public static bool Exists(string pathWithValue)
     {
-        (RegistryKey? baseKey, string? valueKey) = GetKey(pathWithValue, false);
+        (RegistryKey baseKey, string valueKey) = GetKey(pathWithValue, false);
         if (baseKey == null)
         {
-            baseKey?.Dispose();
             return false;
         }
-        object? value = baseKey.GetValue(valueKey);
+        object value = baseKey.GetValue(valueKey);
         if (value == null)
         {
             baseKey.Dispose();
@@ -151,11 +173,11 @@ internal static class RegistryEx
     /// <summary>
     ///     Waits for a registry value to have the given value.
     /// </summary>
-    public static Task CompareAsync<T>(string pathWithKey, Func<T?, bool> predicate, CancellationToken token)
+    public static Task CompareAsync<T>(string pathWithKey, Func<T, bool> predicate, CancellationToken token)
     {
-        static bool Test(RegistryKey? regKey, string? regKeyName, Func<T?, bool> testPredicate)
+        static bool Test(RegistryKey regKey, string regKeyName, Func<T, bool> testPredicate)
         {
-            T? preTestVal = regKey?.GetValue(regKeyName) is T typedValue ? typedValue : default(T);
+            T preTestVal = regKey?.GetValue(regKeyName) is T typedValue ? typedValue : default(T);
             return testPredicate(preTestVal);
         }
 
@@ -166,7 +188,7 @@ internal static class RegistryEx
         }
 
         // Test once before in-case it is already successful.
-        (RegistryKey? baseKey, string? valueKey) = GetKey(pathWithKey, false);
+        (RegistryKey baseKey, string valueKey) = GetKey(pathWithKey, false);
         if (Test(baseKey, valueKey, predicate))
         {
             baseKey?.Dispose();
@@ -203,13 +225,13 @@ internal static class RegistryEx
                         token);
     }
 
-    public static Task CompareAsync<T>(string pathWithKey, Func<T?, bool> predicate, TimeSpan timeout = default)
+    public static Task CompareAsync<T>(string pathWithKey, Func<T, bool> predicate, TimeSpan timeout = default)
     {
         CancellationTokenSource source = new(timeout == default ? TimeSpan.FromSeconds(10) : timeout);
         return CompareAsync(pathWithKey, predicate, source.Token);
     }
 
-    private static (RegistryKey? baseKey, string? valueKey) GetKey(string? path, bool needsWriteAccess = true, bool createIfNotExists = false)
+    private static (RegistryKey baseKey, string valueKeyName) GetKey(string path, bool needsWriteAccess = true, bool createIfNotExists = false)
     {
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -218,7 +240,7 @@ internal static class RegistryEx
         path = path!.Trim();
         // Parse path to get the registry key instance and the name of the .
         string[] parts = path.Split(Path.DirectorySeparatorChar);
-        if (path.Length <= 1)
+        if (parts.Length <= 1)
         {
             return (null, null);
         }
@@ -248,15 +270,16 @@ internal static class RegistryEx
             };
         }
 
-        RegistryKey hiveRef = RegistryKey.OpenBaseKey(hive, RegistryView.Registry64);
-        RegistryKey? key = hiveRef.OpenSubKey(regPathWithoutHiveOrKey, needsWriteAccess);
+        RegistryView registryView = parts.Contains("WOW6432Node") ? RegistryView.Registry32 : RegistryView.Registry64;
+        RegistryKey hiveRef = RegistryKey.OpenBaseKey(hive, registryView);
+        RegistryKey key = hiveRef.OpenSubKey(regPathWithoutHiveOrKey, needsWriteAccess);
         // Should the key (and its path leading to it) be created?
         if (key == null && createIfNotExists)
         {
             key = hiveRef;
             foreach (string part in partsWithoutHive)
             {
-                RegistryKey? prev = key;
+                RegistryKey prev = key;
                 key = key?.OpenSubKey(part, needsWriteAccess) ?? key?.CreateSubKey(part, needsWriteAccess);
 
                 // Cleanup old/parent key reference
