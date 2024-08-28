@@ -25,6 +25,7 @@ public class DiscoverGameTest
         var task = new DiscoverGame
         {
             GameName = "Subnautica",
+            ExeName = "Subnautica",
             BuildEngine = buildEngine
         };
 

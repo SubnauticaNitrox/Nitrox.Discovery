@@ -98,8 +98,10 @@ public sealed class GameInstallationFinder
             return false;
         }
 
+        string extension = Path.GetExtension(executableNameOrEmpty).ToLowerInvariant();
         try
         {
+            executableNameOrEmpty = Path.GetFileNameWithoutExtension(executableNameOrEmpty);
             foreach (string? entry in Directory.EnumerateFileSystemEntries(directory, "*", SearchOption.AllDirectories))
             {
                 if (entry.GetPathDepth(directory!) - 1 > maxDepth)
@@ -107,7 +109,7 @@ public sealed class GameInstallationFinder
                     // "EnumerateFileSystemEntries" will do breath-first-search so we can break as soon as we hit depth limit.
                     break;
                 }
-                if (!Path.GetExtension(entry).Equals(".exe", StringComparison.OrdinalIgnoreCase))
+                if ((extension != "" && !Path.GetExtension(entry).Equals(extension, StringComparison.OrdinalIgnoreCase)) || !entry.IsExecutableFile())
                 {
                     continue;
                 }

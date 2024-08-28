@@ -54,7 +54,7 @@ public class DiscoverGame : Task
         FinderResult finderResult = GameInstallationFinder.Instance.FindGame(new GameInfo
         {
             Name = GameName,
-            ExeName = ExeName?.EndsWith(".exe") == true ? ExeName.Remove(ExeName.Length - 4) : ExeName ?? "",
+            ExeName = ExeName ?? "",
             ExeSearchDepth = Math.Max(0, ExeSearchDepth),
         }).FirstOrDefault(r => string.IsNullOrWhiteSpace(r.ErrorMessage) && !string.IsNullOrWhiteSpace(r.Path));
         GamePath = finderResult?.Path ?? "";

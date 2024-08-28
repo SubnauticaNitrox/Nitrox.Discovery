@@ -21,7 +21,7 @@ public enum GameLibraries
     STEAM = 1 << 2,
 
     /// <summary>
-    /// Epic games
+    /// Epic Games Store
     /// </summary>
     EPIC = 1 << 3,
 
@@ -36,17 +36,17 @@ public enum GameLibraries
     DISCORD = 1 << 5,
 
     /// <summary>
-    /// Related to an official game platform
+    /// Commercial game platforms
     /// </summary>
     PLATFORMS = STEAM | EPIC | MICROSOFT | DISCORD,
 
     /// <summary>
-    /// Related to an external provider source
+    /// Custom source that is not a commercial game platform
     /// </summary>
     CUSTOM = CONFIG | ENVIRONMENT,
 
     /// <summary>
-    /// All Nitrox supported provider
+    /// All supported providers
     /// </summary>
     ALL = PLATFORMS | CUSTOM
 }
