@@ -1,6 +1,6 @@
 ﻿namespace Nitrox.Discovery;
 
-public sealed record GameInfo
+public sealed record FindGameInfo
 {
     public string Name { get; init; } = "";
 

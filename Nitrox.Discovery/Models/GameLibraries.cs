@@ -14,21 +14,23 @@ public enum GameLibraries
     /// Epic Games Store
     /// </summary>
     EPIC = 1 << 1,
+    EGS = EPIC,
 
     /// <summary>
     /// Microsoft store
     /// </summary>
     MICROSOFT = 1 << 2,
-
-    /// <summary>
-    /// Discord game store
-    /// </summary>
-    DISCORD = 1 << 3,
+    MSSTORE = MICROSOFT,
 
     /// <summary>
     /// Games installed using GOG Galaxy
     /// </summary>
-    GOG = 1 << 4,
+    GOG = 1 << 3,
+
+    /// <summary>
+    /// Discord game store
+    /// </summary>
+    DISCORD = 1 << 4,
 
     /// <summary>
     /// Commercial game platforms

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
 using Nitrox.Discovery.InstallationFinders;
 using Nitrox.Discovery.InstallationFinders.Core;
 using Nitrox.Discovery.Models;
@@ -14,33 +14,51 @@ namespace Nitrox.Discovery;
 /// </summary>
 public sealed class GameInstallationFinder
 {
-    private static readonly Lazy<GameInstallationFinder> instance = new(() => new GameInstallationFinder());
-    public static GameInstallationFinder Instance => instance.Value;
-
-    private readonly Dictionary<GameLibraries, IGameFinder> finders = new()
+    private static readonly Lazy<GameInstallationFinder> instance = new(() => new GameInstallationFinder(new()
     {
         { GameLibraries.STEAM, new SteamFinder() },
         { GameLibraries.EPIC, new EpicGamesFinder() },
         { GameLibraries.DISCORD, new DiscordFinder() },
         { GameLibraries.MICROSOFT, new MicrosoftFinder() },
         { GameLibraries.GOG, new GogFinder() },
-    };
+    }));
+
+    public static GameInstallationFinder Instance => instance.Value;
+
+    private readonly Dictionary<GameLibraries, IGameFinder> finders;
+
+    public GameInstallationFinder(Dictionary<GameLibraries, IGameFinder> finders)
+    {
+        this.finders = finders;
+    }
 
     /// <summary>
-    ///     Searches for the game install directory given its <see cref="GameInfo"/>.
+    ///     Searches for the game install directory given its <see cref="FindGameInfo"/>.
     /// </summary>
     /// <param name="gameInfo">Info object of a game.</param>
     /// <param name="gameLibraries">Known game libraries to search through</param>
     /// <returns>Positive and negative results from the search</returns>
-    public IEnumerable<FinderResult> FindGame(GameInfo gameInfo, GameLibraries gameLibraries = GameLibraries.ALL)
+    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo, GameLibraries gameLibraries = GameLibraries.ALL)
     {
         Debug.Assert(gameInfo is not null);
         if (gameInfo is null || !gameLibraries.IsDefined())
         {
+            return [];
+        }
+
+        return FindGame(gameInfo, gameLibraries.GetUniqueNonCombinatoryFlags());
+    }
+
+    /// <inheritdoc cref="FindGame(Nitrox.Discovery.FindGameInfo,Nitrox.Discovery.Models.GameLibraries)"/>
+    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo, IEnumerable<GameLibraries> gameLibraries)
+    {
+        Debug.Assert(gameInfo is not null);
+        if (gameInfo is null || gameLibraries is null)
+        {
             yield break;
         }
 
-        foreach (GameLibraries wantedFinder in gameLibraries.GetUniqueNonCombinatoryFlags())
+        foreach (GameLibraries wantedFinder in gameLibraries)
         {
             if (!finders.TryGetValue(wantedFinder, out IGameFinder finder))
             {
@@ -48,7 +66,7 @@ public sealed class GameInstallationFinder
             }
 
             bool finderHasResult = false;
-            foreach (FinderResult? item in finder.FindGame(gameInfo))
+            foreach (FinderResult item in finder.FindGame(gameInfo))
             {
                 if (item is null)
                 {
@@ -83,7 +101,7 @@ public sealed class GameInstallationFinder
         }
     }
 
-    private static bool PathHasExecutable(string? directory, string executableNameOrEmpty, int maxDepth = 0)
+    private static bool PathHasExecutable(string directory, string executableNameOrEmpty, int maxDepth = 0)
     {
         if (maxDepth < 0)
         {
@@ -102,7 +120,7 @@ public sealed class GameInstallationFinder
         try
         {
             executableNameOrEmpty = Path.GetFileNameWithoutExtension(executableNameOrEmpty);
-            foreach (string? entry in Directory.EnumerateFileSystemEntries(directory, "*", SearchOption.AllDirectories))
+            foreach (string entry in Directory.EnumerateFileSystemEntries(directory, "*", SearchOption.AllDirectories))
             {
                 if (entry.GetPathDepth(directory!) - 1 > maxDepth)
                 {

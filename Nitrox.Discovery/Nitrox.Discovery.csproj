@@ -24,4 +24,8 @@
             </ItemGroup>
         </When>
     </Choose>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Nitrox.Discovery.MSBuild;TestProject" />
+    </ItemGroup>
 </Project>

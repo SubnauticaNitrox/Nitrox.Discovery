@@ -11,7 +11,7 @@ namespace Nitrox.Discovery.InstallationFinders;
 /// </summary>
 public sealed class MicrosoftFinder : IGameFinder
 {
-    public IEnumerable<FinderResult> FindGame(GameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo)
     {
         string[] logicalDrives = [];
         try

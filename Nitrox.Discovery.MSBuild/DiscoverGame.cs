@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Nitrox.Discovery.Extensions;
 using Nitrox.Discovery.InstallationFinders.Core;
+using Nitrox.Discovery.Models;
 
 namespace Nitrox.Discovery.MSBuild;
 
@@ -16,7 +19,7 @@ public class DiscoverGame : Task
     public string GameName { get; set; }
 
     /// <summary>
-    ///     Name of the game executable without the exe extension.
+    ///     Name of the game executable, with or without extension.
     /// </summary>
     public string ExeName { get; set; } = "";
 
@@ -24,6 +27,16 @@ public class DiscoverGame : Task
     ///     Relative depth to search within the game root for the game executable.
     /// </summary>
     public int ExeSearchDepth { get; set; } = 0;
+
+    /// <summary>
+    ///     Specifies the libraries to include in the search. The search will start in the same order as given.
+    ///     Leave empty to search all libraries. See <see cref="GameLibraries"/> for valid library names.
+    /// </summary>
+    /// <remarks>
+    ///     End with "All" to include all libraries in the search, but start the search with the preceding library names.
+    ///     For example: <code>Steam;Epic;All</code>
+    /// </remarks>
+    public ITaskItem[] IncludeLibraries { get; set; } = [];
 
     [Required]
     public string IntermediateOutputPath { get; set; }
@@ -51,12 +64,32 @@ public class DiscoverGame : Task
         }
 
         // Refresh cache
-        FinderResult finderResult = GameInstallationFinder.Instance.FindGame(new GameInfo
+        IEnumerable<GameLibraries> libraries;
+        if (IncludeLibraries is [] or null)
+        {
+            libraries = GameLibraries.ALL.GetUniqueNonCombinatoryFlags();
+        }
+        else
+        {
+            libraries = IncludeLibraries
+                .Select((library, index) =>
+                {
+                    if (!Enum.TryParse(library.ItemSpec, true, out GameLibraries gameLibrary))
+                    {
+                        throw new ArgumentOutOfRangeException($@"Unknown game library ""{library.ItemSpec}""");
+                    }
+
+                    return new { Index = index, GameLibrary = gameLibrary.GetUniqueNonCombinatoryFlags() };
+                }).OrderBy(l => l.Index)
+                .SelectMany(l => l.GameLibrary)
+                .Distinct();
+        }
+        FinderResult finderResult = GameInstallationFinder.Instance.FindGame(new FindGameInfo
         {
             Name = GameName,
             ExeName = ExeName ?? "",
             ExeSearchDepth = Math.Max(0, ExeSearchDepth),
-        }).FirstOrDefault(r => string.IsNullOrWhiteSpace(r.ErrorMessage) && !string.IsNullOrWhiteSpace(r.Path));
+        }, libraries).FirstOrDefault(r => string.IsNullOrWhiteSpace(r.ErrorMessage) && !string.IsNullOrWhiteSpace(r.Path));
         GamePath = finderResult?.Path ?? "";
         StoreGamePath(GamePath);
 

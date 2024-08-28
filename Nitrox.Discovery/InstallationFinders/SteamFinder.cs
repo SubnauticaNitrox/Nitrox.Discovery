@@ -18,7 +18,7 @@ public sealed class SteamFinder : IGameFinder
 {
     private static readonly Regex xcfPropertyLineRegex = new(@"""([^""]*)""\s*""([^""]*)""");
 
-    public IEnumerable<FinderResult> FindGame(GameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo)
     {
         string? steamPath = GetSteamPath();
         if (string.IsNullOrEmpty(steamPath))

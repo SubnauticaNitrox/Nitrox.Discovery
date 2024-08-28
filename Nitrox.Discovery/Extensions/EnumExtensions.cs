@@ -11,6 +11,7 @@ internal static class EnumExtensions
     public static IEnumerable<T> GetUniqueNonCombinatoryFlags<T>(this T flags) where T : Enum
     {
         ulong flagCursor = 1;
+        ulong aggregate = 0; // Used to deduplicate when the enum has flags that have the same value.
         foreach (T value in Enum.GetValues(typeof(T)))
         {
             if (!flags.HasFlag(value))
@@ -24,8 +25,9 @@ internal static class EnumExtensions
                 flagCursor <<= 1;
             }
 
-            if (flagCursor == definedFlagBits && value.HasFlag(value))
+            if (flagCursor == definedFlagBits && (aggregate & flagCursor) == 0 && value.HasFlag(value))
             {
+                aggregate |= flagCursor;
                 yield return value;
             }
         }
