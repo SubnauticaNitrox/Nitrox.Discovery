@@ -7,4 +7,9 @@
     </PropertyGroup>
 
     <UsingTask AssemblyFile="$(_NitroxDiscovery_TaskAssembly)" TaskName="$(MSBuildThisFileName).DiscoverGame" />
+
+    <Target Name="CleanDiscoverGameCache" AfterTargets="Clean" DependsOnTargets="Clean">
+        <RemoveDir Directories="$(BaseIntermediateOutputPath)Nitrox Discovery MSBuild" Condition="'$(BaseIntermediateOutputPath)' != ''" />
+        <RemoveDir Directories="$(IntermediateOutputPath)Nitrox Discovery MSBuild" Condition="'$(IntermediateOutputPath)' != ''" />
+    </Target>
 </Project>

@@ -15,6 +15,8 @@ namespace Nitrox.Discovery.MSBuild;
 /// </summary>
 public class DiscoverGame : Task
 {
+    private const string DiscoverGameCacheFolderName = "Nitrox Discovery MSBuild";
+
     [Required]
     public string GameName { get; set; }
 
@@ -55,7 +57,7 @@ public class DiscoverGame : Task
         // Read from cache
         if (!string.IsNullOrEmpty(IntermediateOutputPath))
         {
-            Directory.CreateDirectory(Path.Combine(IntermediateOutputPath, "nitroxdiscovery"));
+            Directory.CreateDirectory(Path.Combine(IntermediateOutputPath, DiscoverGameCacheFolderName));
             GamePath = ReadGamePath();
         }
         if (Directory.Exists(GamePath))
@@ -103,7 +105,7 @@ public class DiscoverGame : Task
             return;
         }
 
-        string cacheFile = Path.Combine(IntermediateOutputPath, "nitroxdiscovery", Path.ChangeExtension(GameName, "cache"));
+        string cacheFile = Path.Combine(IntermediateOutputPath, DiscoverGameCacheFolderName, Path.ChangeExtension(GameName, "cache"));
         File.WriteAllText(cacheFile, gamePath);
     }
 
@@ -114,7 +116,7 @@ public class DiscoverGame : Task
             return "";
         }
 
-        string cacheFile = Path.Combine(IntermediateOutputPath, "nitroxdiscovery", Path.ChangeExtension(GameName, "cache"));
+        string cacheFile = Path.Combine(IntermediateOutputPath, DiscoverGameCacheFolderName, Path.ChangeExtension(GameName, "cache"));
         try
         {
             return File.ReadAllText(cacheFile).Trim();
