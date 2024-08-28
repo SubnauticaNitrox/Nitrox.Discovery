@@ -20,7 +20,7 @@ public sealed class SteamFinder : IGameFinder
 
     public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo)
     {
-        string? steamPath = GetSteamPath();
+        string steamPath = GetSteamPath();
         if (string.IsNullOrEmpty(steamPath))
         {
             yield return Error("Steam is not installed");
@@ -29,7 +29,7 @@ public sealed class SteamFinder : IGameFinder
         string appsPath = Path.Combine(steamPath, "steamapps");
         int steamAppId = GetSteamAppIdFromAcfFileMatchingGameName(appsPath, gameInfo.Name);
 
-        string? path;
+        string path;
         if (File.Exists(Path.Combine(appsPath, $"appmanifest_{steamAppId}.acf")))
         {
             path = Path.Combine(appsPath, "common", gameInfo.Name);
@@ -72,11 +72,11 @@ public sealed class SteamFinder : IGameFinder
         return -1;
     }
 
-    private static string? GetSteamPath()
+    private static string GetSteamPath()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            string? steamPath = RegistryEx.Read<string>(@"Software\Valve\Steam\SteamPath");
+            string steamPath = RegistryEx.Read<string>(@"Software\Valve\Steam\SteamPath");
 
             if (string.IsNullOrWhiteSpace(steamPath))
             {
@@ -90,7 +90,7 @@ public sealed class SteamFinder : IGameFinder
         }
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            string? homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             if (string.IsNullOrWhiteSpace(homePath))
             {
                 homePath = Environment.GetEnvironmentVariable("HOME");
@@ -128,7 +128,7 @@ public sealed class SteamFinder : IGameFinder
         }
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            string? homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             if (string.IsNullOrWhiteSpace(homePath))
             {
                 homePath = Environment.GetEnvironmentVariable("HOME");
@@ -153,7 +153,7 @@ public sealed class SteamFinder : IGameFinder
     /// <summary>
     /// Finds game install directory by iterating through all the steam game libraries configured, matching the given appid.
     /// </summary>
-    private static string? SearchAllInstallations(string libraryFolders, string gameName)
+    private static string SearchAllInstallations(string libraryFolders, string gameName)
     {
         if (!File.Exists(libraryFolders))
         {

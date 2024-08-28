@@ -6,9 +6,9 @@ namespace Nitrox.Discovery.InstallationFinders.Core;
 
 public sealed record FinderResult
 {
-    public string? ErrorMessage { get; init; }
+    public string ErrorMessage { get; init; }
     public GameLibraries Origin { get; init; }
-    public string? Path { get; init; }
+    public string Path { get; init; }
 
     /// <summary>
     ///     Gets the name of type that made the result.

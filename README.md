@@ -11,7 +11,7 @@ Discovers the path to an installed game from a given game name.
         <!-- Change this (optional: can be put in your Directory.Build.props file) -->
         <GameName>MY_GAME</GameName>
     </PropertyGroup>
-    <DiscoverGame GameName="$(GameName)" IntermediateOutputPath="$(IntermediateOutputPath)">
+    <DiscoverGame GameName="$(GameName)" IntermediateOutputPath="$(BaseIntermediateOutputPath)">
         <Output TaskParameter="GamePath" PropertyName="GameDir" />
     </DiscoverGame>
     <Error Condition="'$(GameDir)' == ''" Text="Failed to find the game '$(GameName)' on your machine" />
