@@ -56,7 +56,7 @@ internal static class RegistryEx
         }
         try
         {
-            using var target = baseKey.OpenSubKey(valueKeyName, false);
+            using RegistryKey target = baseKey.OpenSubKey(valueKeyName, false);
             return target?.GetSubKeyNames() ?? [];
         }
         catch
@@ -177,11 +177,11 @@ internal static class RegistryEx
     {
         static bool Test(RegistryKey regKey, string regKeyName, Func<T, bool> testPredicate)
         {
-            T preTestVal = regKey?.GetValue(regKeyName) is T typedValue ? typedValue : default(T);
+            T preTestVal = regKey?.GetValue(regKeyName) is T typedValue ? typedValue : default;
             return testPredicate(preTestVal);
         }
 
-        if (token == default(CancellationToken))
+        if (token == default)
         {
             CancellationTokenSource source = new(TimeSpan.FromSeconds(10));
             token = source.Token;
@@ -197,32 +197,32 @@ internal static class RegistryEx
 
         // Wait for predicate to be successful.
         return Task.Run(async () =>
+            {
+                try
+                {
+                    while (!token.IsCancellationRequested)
+                    {
+                        // If regkey didn't exist yet it might later.
+                        if (baseKey == null)
                         {
-                            try
-                            {
-                                while (!token.IsCancellationRequested)
-                                {
-                                    // If regkey didn't exist yet it might later.
-                                    if (baseKey == null)
-                                    {
-                                        (baseKey, valueKey) = GetKey(pathWithKey, false);
-                                    }
+                            (baseKey, valueKey) = GetKey(pathWithKey, false);
+                        }
 
-                                    if (!Test(baseKey, valueKey, predicate))
-                                    {
-                                        await Task.Delay(100, token);
-                                        continue;
-                                    }
+                        if (!Test(baseKey, valueKey, predicate))
+                        {
+                            await Task.Delay(100, token);
+                            continue;
+                        }
 
-                                    break;
-                                }
-                            }
-                            finally
-                            {
-                                baseKey?.Dispose();
-                            }
-                        },
-                        token);
+                        break;
+                    }
+                }
+                finally
+                {
+                    baseKey?.Dispose();
+                }
+            },
+            token);
     }
 
     public static Task CompareAsync<T>(string pathWithKey, Func<T, bool> predicate, TimeSpan timeout = default)

@@ -1,5 +1,4 @@
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using Nitrox.Discovery.MSBuild;
 using NSubstitute;
 
@@ -15,7 +14,7 @@ public class DiscoverGameTest
     public void Startup()
     {
         buildEngine = Substitute.For<IBuildEngine>();
-        errors = new List<BuildErrorEventArgs>();
+        errors = new();
         buildEngine.When(x => x.LogErrorEvent(Arg.Any<BuildErrorEventArgs>())).Do(info => errors.Add(info.Arg<BuildErrorEventArgs>()));
     }
 
@@ -23,7 +22,7 @@ public class DiscoverGameTest
     public void TestExecute()
     {
         //Arrange
-        var task = new DiscoverGame
+        DiscoverGame task = new()
         {
             GameName = "Subnautica",
             ExeName = "Subnautica",
@@ -31,7 +30,7 @@ public class DiscoverGameTest
         };
 
         //Act
-        var success = task.Execute();
+        bool success = task.Execute();
 
         //Assert
         Assert.IsTrue(success);

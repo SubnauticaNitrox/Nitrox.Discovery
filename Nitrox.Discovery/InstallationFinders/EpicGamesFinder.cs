@@ -7,7 +7,7 @@ using Nitrox.Discovery.InstallationFinders.Core;
 namespace Nitrox.Discovery.InstallationFinders;
 
 /// <summary>
-/// Trying to find the path in the Epic Games installation records.
+///     Trying to find the path in the Epic Games installation records.
 /// </summary>
 public sealed class EpicGamesFinder : IGameFinder
 {

@@ -6,10 +6,10 @@
         <_NitroxDiscovery_TaskAssembly>$(MSBuildThisFileDirectory)..\tasks\$(_NitroxDiscovery_TaskFolder)\$(MSBuildThisFileName).dll</_NitroxDiscovery_TaskAssembly>
     </PropertyGroup>
 
-    <UsingTask AssemblyFile="$(_NitroxDiscovery_TaskAssembly)" TaskName="$(MSBuildThisFileName).DiscoverGame" />
+    <UsingTask AssemblyFile="$(_NitroxDiscovery_TaskAssembly)" TaskName="$(MSBuildThisFileName).DiscoverGame"/>
 
     <Target Name="CleanDiscoverGameCache" AfterTargets="Clean" DependsOnTargets="Clean">
-        <RemoveDir Directories="$(BaseIntermediateOutputPath)Nitrox Discovery MSBuild" Condition="'$(BaseIntermediateOutputPath)' != ''" />
-        <RemoveDir Directories="$(IntermediateOutputPath)Nitrox Discovery MSBuild" Condition="'$(IntermediateOutputPath)' != ''" />
+        <RemoveDir Directories="$(BaseIntermediateOutputPath)Nitrox Discovery MSBuild" Condition="'$(BaseIntermediateOutputPath)' != ''"/>
+        <RemoveDir Directories="$(IntermediateOutputPath)Nitrox Discovery MSBuild" Condition="'$(IntermediateOutputPath)' != ''"/>
     </Target>
 </Project>

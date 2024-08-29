@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using System.IO;
 using Nitrox.Discovery.InstallationFinders.Core;
-using static Nitrox.Discovery.InstallationFinders.Core.FinderResult;
 
 namespace Nitrox.Discovery.InstallationFinders;
 
 /// <summary>
-/// MS Store games are stored under <c>C:\XboxGames\[GAME]\Content\</c> by default.
-/// It's likely we could read the choosen path from <c>C:\Program Files\WindowsApps</c> but we're unable to read store settings from those folders.
+///     MS Store games are stored under <c>C:\XboxGames\[GAME]\Content\</c> by default.
+///     It's likely we could read the choosen path from <c>C:\Program Files\WindowsApps</c> but we're unable to read store settings from those folders.
 /// </summary>
 public sealed class MicrosoftFinder : IGameFinder
 {

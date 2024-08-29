@@ -24,40 +24,40 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*" PrivateAssets="all" ExcludeAssets="Runtime" />
-        <ProjectReference Include="..\Nitrox.Discovery\Nitrox.Discovery.csproj" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*" PrivateAssets="all" ExcludeAssets="Runtime"/>
+        <ProjectReference Include="..\Nitrox.Discovery\Nitrox.Discovery.csproj"/>
 
         <PackageReference Include="PolySharp" Version="1.13.1" PrivateAssets="all"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="$(MSBuildProjectName).props" Pack="true" PackagePath="build\" />
-        <None Include="..\README.md" Pack="true" PackagePath="\" Visible="false" />
+        <None Include="$(MSBuildProjectName).props" Pack="true" PackagePath="build\"/>
+        <None Include="..\README.md" Pack="true" PackagePath="\" Visible="false"/>
     </ItemGroup>
 
     <!-- This is the target we defined above. It's purpose is to add all of our PackageReference and ProjectReference's runtime assets to our package output.  -->
     <Target
-            Name="CopyProjectReferencesToPackage"
-            DependsOnTargets="ResolveReferences">
+        Name="CopyProjectReferencesToPackage"
+        DependsOnTargets="ResolveReferences">
         <ItemGroup>
             <!-- The TargetPath is the path inside the package that the source file will be placed. This is already precomputed in the ReferenceCopyLocalPaths items' DestinationSubPath, so reuse it here. -->
             <BuildOutputInPackage
-                    Include="@(ReferenceCopyLocalPaths)"
-                    TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
+                Include="@(ReferenceCopyLocalPaths)"
+                TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)"/>
         </ItemGroup>
     </Target>
 
     <!-- This target adds the generated deps.json file to our package output -->
     <Target
-            Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput"
-            BeforeTargets="BuiltProjectOutputGroup"
-            Condition=" '$(GenerateDependencyFile)' == 'true'">
+        Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput"
+        BeforeTargets="BuiltProjectOutputGroup"
+        Condition=" '$(GenerateDependencyFile)' == 'true'">
 
         <ItemGroup>
             <BuiltProjectOutputGroupOutput
-                    Include="$(ProjectDepsFilePath)"
-                    TargetPath="$(ProjectDepsFileName)"
-                    FinalOutputPath="$(ProjectDepsFilePath)" />
+                Include="$(ProjectDepsFilePath)"
+                TargetPath="$(ProjectDepsFileName)"
+                FinalOutputPath="$(ProjectDepsFilePath)"/>
         </ItemGroup>
     </Target>
 </Project>

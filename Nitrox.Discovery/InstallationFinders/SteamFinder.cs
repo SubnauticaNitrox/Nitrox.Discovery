@@ -10,9 +10,9 @@ using static Nitrox.Discovery.InstallationFinders.Core.FinderResult;
 namespace Nitrox.Discovery.InstallationFinders;
 
 /// <summary>
-/// Tries to find the path in the Steam installation directory by the name of the game.
-/// By default, each game will have a corresponding appmanifest_{appid}.acf file in the steamapps folder.
-/// Except for some games that are installed on a different disk drive, in those case 'libraryfolders.vdf' will give us the real location of the folder containing the acf files.
+///     Tries to find the path in the Steam installation directory by the name of the game.
+///     By default, each game will have a corresponding appmanifest_{appid}.acf file in the steamapps folder.
+///     Except for some games that are installed on a different disk drive, in those case 'libraryfolders.vdf' will give us the real location of the folder containing the acf files.
 /// </summary>
 public sealed class SteamFinder : IGameFinder
 {
@@ -58,7 +58,7 @@ public sealed class SteamFinder : IGameFinder
         }
         foreach (string acfFile in Directory.EnumerateFiles(rootDirectory, "appmanifest_*.acf", SearchOption.TopDirectoryOnly))
         {
-            var props = ExtractPropertiesFromXcfFile(acfFile, tuple => tuple.key.ToLowerInvariant() is "appid" or "name").ToDictionary(t => t.key, t => t.value);
+            Dictionary<string, string> props = ExtractPropertiesFromXcfFile(acfFile, tuple => tuple.key.ToLowerInvariant() is "appid" or "name").ToDictionary(t => t.key, t => t.value);
             if (!props.TryGetValue("name", out string extractedGameName) || !extractedGameName.Equals(gameName, StringComparison.OrdinalIgnoreCase))
             {
                 continue;
@@ -113,7 +113,7 @@ public sealed class SteamFinder : IGameFinder
                 // Flatpack install
                 // https://github.com/flathub/com.valvesoftware.Steam/wiki, https://flathub.org/apps/com.valvesoftware.Steam
                 Path.Combine(homePath, ".var", "app", "com.valvesoftware.Steam", ".local", "share", "Steam"),
-                Path.Combine(homePath, ".var", "app", "com.valvesoftware.Steam", ".steam", "steam"),
+                Path.Combine(homePath, ".var", "app", "com.valvesoftware.Steam", ".steam", "steam")
             ];
 
             foreach (string path in commonSteamPath)
@@ -151,7 +151,7 @@ public sealed class SteamFinder : IGameFinder
     }
 
     /// <summary>
-    /// Finds game install directory by iterating through all the steam game libraries configured, matching the given appid.
+    ///     Finds game install directory by iterating through all the steam game libraries configured, matching the given appid.
     /// </summary>
     private static string SearchAllInstallations(string libraryFolders, string gameName)
     {

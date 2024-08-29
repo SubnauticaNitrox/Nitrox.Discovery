@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using Nitrox.Discovery.InstallationFinders;
 using Nitrox.Discovery.InstallationFinders.Core;
 using Nitrox.Discovery.Models;
@@ -10,20 +9,18 @@ using Nitrox.Discovery.Models;
 namespace Nitrox.Discovery;
 
 /// <summary>
-/// Main game installation finder that will use all available methods of detection to find the game installation directory
+///     Main game installation finder that will use all available methods of detection to find the game installation directory
 /// </summary>
 public sealed class GameInstallationFinder
 {
-    private static readonly Lazy<GameInstallationFinder> instance = new(() => new GameInstallationFinder(new()
+    private static readonly Lazy<GameInstallationFinder> instance = new(() => new(new()
     {
         { GameLibraries.STEAM, new SteamFinder() },
         { GameLibraries.EPIC, new EpicGamesFinder() },
         { GameLibraries.DISCORD, new DiscordFinder() },
         { GameLibraries.MICROSOFT, new MicrosoftFinder() },
-        { GameLibraries.GOG, new GogFinder() },
+        { GameLibraries.GOG, new GogFinder() }
     }));
-
-    public static GameInstallationFinder Instance => instance.Value;
 
     private readonly Dictionary<GameLibraries, IGameFinder> finders;
 
@@ -32,8 +29,10 @@ public sealed class GameInstallationFinder
         this.finders = finders;
     }
 
+    public static GameInstallationFinder Instance => instance.Value;
+
     /// <summary>
-    ///     Searches for the game install directory given its <see cref="FindGameInfo"/>.
+    ///     Searches for the game install directory given its <see cref="FindGameInfo" />.
     /// </summary>
     /// <param name="gameInfo">Info object of a game.</param>
     /// <param name="gameLibraries">Known game libraries to search through</param>
@@ -49,7 +48,7 @@ public sealed class GameInstallationFinder
         return FindGame(gameInfo, gameLibraries.GetUniqueNonCombinatoryFlags());
     }
 
-    /// <inheritdoc cref="FindGame(Nitrox.Discovery.FindGameInfo,Nitrox.Discovery.Models.GameLibraries)"/>
+    /// <inheritdoc cref="FindGame(Nitrox.Discovery.FindGameInfo,Nitrox.Discovery.Models.GameLibraries)" />
     public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo, IEnumerable<GameLibraries> gameLibraries)
     {
         Debug.Assert(gameInfo is not null);
@@ -91,7 +90,7 @@ public sealed class GameInstallationFinder
 
             if (!finderHasResult)
             {
-                yield return new FinderResult
+                yield return new()
                 {
                     FinderName = finder.GetType().Name,
                     Origin = wantedFinder,

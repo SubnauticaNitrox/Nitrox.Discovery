@@ -32,7 +32,7 @@ public class DiscoverGame : Task
 
     /// <summary>
     ///     Specifies the libraries to include in the search. The search will start in the same order as given.
-    ///     Leave empty to search all libraries. See <see cref="GameLibraries"/> for valid library names.
+    ///     Leave empty to search all libraries. See <see cref="GameLibraries" /> for valid library names.
     /// </summary>
     /// <remarks>
     ///     End with "All" to include all libraries in the search, but start the search with the preceding library names.
@@ -86,11 +86,11 @@ public class DiscoverGame : Task
                 .SelectMany(l => l.GameLibrary)
                 .Distinct();
         }
-        FinderResult finderResult = GameInstallationFinder.Instance.FindGame(new FindGameInfo
+        FinderResult finderResult = GameInstallationFinder.Instance.FindGame(new()
         {
             Name = GameName,
             ExeName = ExeName ?? "",
-            ExeSearchDepth = Math.Max(0, ExeSearchDepth),
+            ExeSearchDepth = Math.Max(0, ExeSearchDepth)
         }, libraries).FirstOrDefault(r => string.IsNullOrWhiteSpace(r.ErrorMessage) && !string.IsNullOrWhiteSpace(r.Path));
         GamePath = finderResult?.Path ?? "";
         StoreGamePath(GamePath);

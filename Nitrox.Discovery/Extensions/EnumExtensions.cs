@@ -34,8 +34,5 @@ internal static class EnumExtensions
     }
 
     /// <inheritdoc cref="Enum.IsDefined" />
-    public static bool IsDefined<TEnum>(this TEnum value) where TEnum : Enum
-    {
-        return Enum.IsDefined(typeof(TEnum), value);
-    }
+    public static bool IsDefined<TEnum>(this TEnum value) where TEnum : Enum => Enum.IsDefined(typeof(TEnum), value);
 }
