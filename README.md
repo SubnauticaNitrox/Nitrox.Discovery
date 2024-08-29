@@ -31,8 +31,8 @@ Discovers the path to an installed game from a given game name.
 </Target>
 ```
 
-^ `Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''"` is needed so Visual Studio can still load Nuget packages and not fail on "DiscoverGame task not found". Otherwise, you need to run
-`dotnet restore` before opening solution in Visual Studio.
+> [!IMPORTANT]
+> `Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''"` is needed so Visual Studio can still load Nuget packages without requiring `DiscoverTask` to exist!
 
 ### If you want to have game references resolved, customized for a project.csproj, add this to it
 
