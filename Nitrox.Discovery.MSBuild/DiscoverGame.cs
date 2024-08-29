@@ -40,7 +40,6 @@ public class DiscoverGame : Task
     /// </remarks>
     public ITaskItem[] IncludeLibraries { get; set; } = [];
 
-    [Required]
     public string IntermediateOutputPath { get; set; }
 
     [Output]
@@ -52,6 +51,11 @@ public class DiscoverGame : Task
         {
             Log.LogWarning($@"Property ""{nameof(GameName)}"" is required");
             return false;
+        }
+        IntermediateOutputPath = string.IsNullOrWhiteSpace(IntermediateOutputPath) ? Path.Combine(".", "obj") : IntermediateOutputPath;
+        if (!Directory.Exists(IntermediateOutputPath))
+        {
+            IntermediateOutputPath = "";
         }
 
         // Read from cache
