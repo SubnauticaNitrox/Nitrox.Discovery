@@ -32,7 +32,7 @@ Discovers the path to an installed game from a given game name.
 ```
 
 > [!IMPORTANT]
-> `Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''"` is needed so Visual Studio can still load Nuget packages without requiring `DiscoverTask` to exist!
+> `Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''"` is needed so Visual Studio can still load Nuget packages without requiring `DiscoverGame` task to exist!
 
 ### If you want to have game references resolved, customized for a project.csproj, add this to it
 
