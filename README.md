@@ -4,7 +4,28 @@
 
 Discovers the path to an installed game from a given game name.
 
-### Use with msbuild
+### Use with MSBuild (minimized setup)
+
+```xml
+<Target Name="FindGameAndIncludeReferences" BeforeTargets="ResolveAssemblyReferences" Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''">
+    <DiscoverGame GameName="Subnautica"> <!-- CHANGE THIS -->
+        <Output TaskParameter="GamePath" PropertyName="GameDir" />
+    </DiscoverGame>
+    <Error Condition="'$(GameDir)' == ''" Text="Failed to find the game 'Subnautica' on your machine" />
+
+    <!-- Load any references to game DLLs here -->
+    <ItemGroup>
+        <Reference Include="MyGameDll">
+            <HintPath>$(GameDir)\bin\MyGameDll.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+</Target>
+```
+
+> [!IMPORTANT]
+> `Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''"` is needed so Visual Studio can still load Nuget packages without requiring `DiscoverGame` task to exist!
+
+### Recommended setup
 
 ```xml
 <Target Name="FindGameAndIncludeReferences" BeforeTargets="ResolveAssemblyReferences" Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''">
@@ -31,10 +52,7 @@ Discovers the path to an installed game from a given game name.
 </Target>
 ```
 
-> [!IMPORTANT]
-> `Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''"` is needed so Visual Studio can still load Nuget packages without requiring `DiscoverGame` task to exist!
-
-### If you want to have game references resolved, customized for a project.csproj, add this to it
+### You can append other references on a per project basis like this
 
 ```xml
 <Target Name="MoreGameReferences" AfterTargets="FindGameAndIncludeReferences">
