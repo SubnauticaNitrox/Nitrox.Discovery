@@ -17,7 +17,7 @@ namespace Nitrox.Discovery.InstallationFinders;
 public sealed class SteamFinder : IGameFinder
 {
     private static readonly Regex xcfPropertyLineRegex = new(@"""([^""]*)""\s*""([^""]*)""");
-    private static readonly string[] acfGameNameAndIdKeys = ["appid", "name"];
+    private static readonly string[] acfGameInfoKeys = ["appid", "name", "installdir"];
     private static readonly char[] acfLineTrimCharacters = [' ', '\t'];
 
     public IEnumerable<FinderResult> FindGame(FindGameInfo input)
@@ -26,19 +26,20 @@ public sealed class SteamFinder : IGameFinder
         if (string.IsNullOrEmpty(steamPath))
         {
             yield return Error("Steam is not installed");
+            yield break;
         }
 
         string appsPath = Path.Combine(steamPath, "steamapps");
-        int steamAppId = GetSteamAppIdFromAcfFileMatchingGameName(appsPath, input.GameName);
+        (int steamAppId, string installDir) = GetSteamGameIdAndInstallDirFromAcfFiles(appsPath, input);
 
         string path;
         if (File.Exists(Path.Combine(appsPath, $"appmanifest_{steamAppId}.acf")))
         {
-            path = Path.Combine(appsPath, "common", input.GameName);
+            path = Path.Combine(appsPath, "common", installDir);
         }
         else
         {
-            path = SearchAllInstallations(Path.Combine(appsPath, "libraryfolders.vdf"), input.GameName);
+            path = SearchAllInstallations(Path.Combine(appsPath, "libraryfolders.vdf"), input);
             if (string.IsNullOrWhiteSpace(path))
             {
                 yield break;
@@ -47,16 +48,17 @@ public sealed class SteamFinder : IGameFinder
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            path = Path.Combine(path, $"{input.GameName}.app", "Contents");
+            yield return Path.Combine(path, $"{input.NormalizedGameName}.app", "Contents");
+            path = Path.Combine(path, $"{installDir}.app", "Contents");
         }
         yield return path;
     }
 
-    private static int GetSteamAppIdFromAcfFileMatchingGameName(string rootDirectory, string gameName)
+    private static (int appId, string installDir) GetSteamGameIdAndInstallDirFromAcfFiles(string rootDirectory, FindGameInfo gameInfo)
     {
         if (!Directory.Exists(rootDirectory))
         {
-            return -1;
+            return (-1, "");
         }
         string[] acfFiles;
         try
@@ -65,23 +67,28 @@ public sealed class SteamFinder : IGameFinder
         }
         catch (IOException)
         {
-            return -1;
+            return (-1, "");
         }
 
         foreach (string acfFile in acfFiles)
         {
-            Dictionary<string,string> props = ExtractPropertiesFromXcfFile(acfFile, acfGameNameAndIdKeys);
-            if (!props.TryGetValue("name", out string extractedGameName) || !extractedGameName.Equals(gameName, StringComparison.OrdinalIgnoreCase))
+            Dictionary<string,string> props = ExtractPropertiesFromXcfFile(acfFile, acfGameInfoKeys);
+            if (!props.TryGetValue("name", out string extractedGameName) || !gameInfo.IsSimilarGameName(extractedGameName))
             {
                 continue;
             }
-            if (props.TryGetValue("appid", out string extractedAppId) && int.TryParse(extractedAppId, out int appId))
+            if (!props.TryGetValue("installdir", out string installDir) || string.IsNullOrWhiteSpace(installDir))
             {
-                return appId;
+                continue;
             }
+            if (!props.TryGetValue("appid", out string extractedAppId) || !int.TryParse(extractedAppId, out int appId))
+            {
+                continue;
+            }
+            return (appId, installDir);
         }
 
-        return -1;
+        return (-1, "");
     }
 
     private static string GetSteamPath()
@@ -165,7 +172,7 @@ public sealed class SteamFinder : IGameFinder
     /// <summary>
     ///     Finds game install directory by iterating through all the steam game libraries configured, matching the given appid.
     /// </summary>
-    private static string SearchAllInstallations(string libraryFolders, string gameName)
+    private static string SearchAllInstallations(string libraryFolders, FindGameInfo gameInfo)
     {
         if (!File.Exists(libraryFolders))
         {
@@ -189,10 +196,10 @@ public sealed class SteamFinder : IGameFinder
 
             string value = regMatch.Groups[2].Value;
 
-            int appId = GetSteamAppIdFromAcfFileMatchingGameName(Path.Combine(value, "steamapps"), gameName);
+            (int appId, string installDir) = GetSteamGameIdAndInstallDirFromAcfFiles(Path.Combine(value, "steamapps"), gameInfo);
             if (appId > -1)
             {
-                return Path.Combine(value, "steamapps", "common", gameName);
+                return Path.Combine(value, "steamapps", "common", installDir);
             }
         }
 

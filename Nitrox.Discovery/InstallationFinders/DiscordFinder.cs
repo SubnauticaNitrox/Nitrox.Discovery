@@ -14,8 +14,14 @@ public sealed class DiscordFinder : IGameFinder
     public IEnumerable<FinderResult> FindGame(FindGameInfo input)
     {
         string localAppdataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string discordGamesDirectory = Path.Combine(localAppdataDirectory, "DiscordGames");
 
-        yield return Path.Combine(localAppdataDirectory, "DiscordGames", input.GameName, "content");
-        yield return Path.Combine("C:\\", "Games", input.GameName, "content");
+        yield return Path.Combine(discordGamesDirectory, input.NormalizedGameName, "content");
+        yield return Path.Combine("C:\\", "Games", input.NormalizedGameName, "content");
+        string dirSearch = input.FindFolderWithGameName(discordGamesDirectory);
+        if (dirSearch != "")
+        {
+            yield return Path.Combine(dirSearch, "content");
+        }
     }
 }

@@ -23,11 +23,11 @@ public sealed class GogFinder : IGameFinder
         foreach (string gameId in RegistryEx.GetSubKeyNames(GogGamesInRegistry))
         {
             string gamePath = RegistryEx.Read<string>(Path.Combine(GogGamesInRegistry, gameId, "path"));
-            if (Path.GetFileName(gamePath) == input.GameName)
+            if (input.IsSimilarGameName(Path.GetFileName(gamePath)))
             {
                 yield return gamePath;
             }
-            else if (RegistryEx.Read<string>(Path.Combine(GogGamesInRegistry, gameId, "gameName")) == input.GameName)
+            else if (input.IsSimilarGameName(RegistryEx.Read<string>(Path.Combine(GogGamesInRegistry, gameId, "gameName"))))
             {
                 yield return gamePath;
             }

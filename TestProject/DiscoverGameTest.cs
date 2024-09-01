@@ -1,4 +1,6 @@
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+using Nitrox.Discovery.Models;
 using Nitrox.Discovery.MSBuild;
 using NSubstitute;
 
@@ -25,7 +27,7 @@ public class DiscoverGameTest
         DiscoverGame task = new()
         {
             GameName = "Subnautica",
-            ExeName = "Subnautica",
+            IncludeLibraries = [new TaskItem(nameof(GameLibraries.ALL))],
             BuildEngine = buildEngine
         };
 

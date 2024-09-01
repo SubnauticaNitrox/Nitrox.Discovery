@@ -11,7 +11,7 @@ namespace Nitrox.Discovery.InstallationFinders;
 /// </summary>
 public sealed class EpicGamesFinder : IGameFinder
 {
-    private static readonly Regex installLocationRegex = new("\"InstallLocation\"[^\"]*\"(.*)\"");
+    private static readonly Regex itemFilePropertyLineRegex = new(@"""([^""]*)"":\s*""([^""]*)""");
 
     public IEnumerable<FinderResult> FindGame(FindGameInfo input)
     {
@@ -22,19 +22,61 @@ public sealed class EpicGamesFinder : IGameFinder
         {
             yield return FinderResult.Error("Epic games manifest directory does not exist. Verify that Epic Games Store has been installed");
         }
-
-        string[] files = Directory.GetFiles(epicGamesManifestsDir, "*.item");
-        foreach (string file in files)
+        string[] files;
+        try
         {
-            string fileText = File.ReadAllText(file);
-            Match match = installLocationRegex.Match(fileText);
-
-            if (match.Success && match.Value.Contains(input.GameName))
-            {
-                yield return Path.GetFullPath(match.Groups[1].Value);
-            }
+            files = Directory.GetFiles(epicGamesManifestsDir, "*.item");
+        }
+        catch (IOException)
+        {
+            yield break;
         }
 
-        yield return FinderResult.Error("Could not find game installation directory from Epic Games installation records. Verify that game has been installed with Epic Games Store");
+        foreach (string file in files)
+        {
+            (string displayName, string installLocation) = GetNameAndInstallFromItemFile(file);
+            if (input.IsSimilarGameName(displayName) && !string.IsNullOrWhiteSpace(installLocation))
+            {
+                yield return Path.GetFullPath(installLocation);
+            }
+        }
+    }
+
+    private (string displayName, string installLocation) GetNameAndInstallFromItemFile(string itemFile)
+    {
+        string displayName = "";
+        string installLocation = "";
+        try
+        {
+            using StreamReader file = new(itemFile);
+
+            while (file.ReadLine() is { } line)
+            {
+                line = Regex.Unescape(line);
+                Match regMatch = itemFilePropertyLineRegex.Match(line);
+                string key = regMatch.Groups[1].Value.ToLowerInvariant();
+                string value = regMatch.Groups[2].Value;
+
+                switch (key)
+                {
+                    case "displayname":
+                        displayName = value;
+                        break;
+                    case "installlocation":
+                        installLocation = value;
+                        break;
+                }
+
+                if (displayName != "" && installLocation != "")
+                {
+                    break;
+                }
+            }
+        }
+        catch (IOException)
+        {
+            // ignored
+        }
+        return (displayName, installLocation);
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using Nitrox.Discovery.InstallationFinders.Core;
 
 namespace Nitrox.Discovery.InstallationFinders;
@@ -12,6 +13,11 @@ public sealed class MicrosoftFinder : IGameFinder
 {
     public IEnumerable<FinderResult> FindGame(FindGameInfo input)
     {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            yield break;
+        }
+
         string[] logicalDrives = [];
         try
         {
@@ -23,10 +29,14 @@ public sealed class MicrosoftFinder : IGameFinder
             // ignored
         }
 
+        yield return Path.Combine("C:\\", "XboxGames", input.NormalizedGameName, "Content");
         foreach (string logicalDrive in logicalDrives)
         {
-            yield return Path.Combine(logicalDrive, "XboxGames", input.GameName, "Content");
+            string dirSearch = input.FindFolderWithGameName(Path.Combine(logicalDrive, "XboxGames"));
+            if (dirSearch != "")
+            {
+                yield return Path.Combine(dirSearch, "Content");
+            }
         }
-        yield return Path.Combine("C:\\", "XboxGames", input.GameName, "Content");
     }
 }
