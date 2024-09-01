@@ -109,8 +109,7 @@ public class DiscoverGame : Task
             return;
         }
 
-        string cacheFile = Path.Combine(IntermediateOutputPath, DiscoverGameCacheFolderName, Path.ChangeExtension(GameName, "cache"));
-        File.WriteAllText(cacheFile, gamePath);
+        File.WriteAllText(GetGameNameCacheFileName(), gamePath);
     }
 
     private string ReadGamePath()
@@ -120,7 +119,7 @@ public class DiscoverGame : Task
             return "";
         }
 
-        string cacheFile = Path.Combine(IntermediateOutputPath, DiscoverGameCacheFolderName, Path.ChangeExtension(GameName, "cache"));
+        string cacheFile = GetGameNameCacheFileName();
         try
         {
             return File.ReadAllText(cacheFile).Trim();
@@ -129,5 +128,10 @@ public class DiscoverGame : Task
         {
             return "";
         }
+    }
+
+    private string GetGameNameCacheFileName()
+    {
+        return Path.Combine(IntermediateOutputPath, DiscoverGameCacheFolderName, Path.ChangeExtension(GameName.ReplaceInvalidFileNameChars(), "cache"));
     }
 }

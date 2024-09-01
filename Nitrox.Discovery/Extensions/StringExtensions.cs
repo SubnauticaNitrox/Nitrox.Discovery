@@ -40,4 +40,13 @@ internal static class StringExtensions
                 return false;
         }
     }
+
+    public static string ReplaceInvalidFileNameChars(this string fileName, string replacement = "_")
+    {
+        if (fileName == null)
+        {
+            throw new ArgumentNullException(nameof(fileName));
+        }
+        return string.Join(replacement, fileName.Split(Path.GetInvalidFileNameChars()));
+    }
 }
