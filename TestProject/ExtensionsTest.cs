@@ -20,6 +20,13 @@ public class ExtensionsTest
         ((TestEnumFlags)int.MaxValue).GetUniqueNonCombinatoryFlags().Should().BeEquivalentTo([TestEnumFlags.A, TestEnumFlags.B, TestEnumFlags.C, TestEnumFlags.D, TestEnumFlags.E, TestEnumFlags.F]);
     }
 
+    [TestMethod]
+    public void InvalidFileName()
+    {
+        "Subnautica: Below Zero".ReplaceInvalidFileNameChars().Should().Be("Subnautica Below Zero");
+        "Subnautica: Below Zero".ReplaceInvalidFileNameChars("_").Should().Be("Subnautica_ Below Zero");
+    }
+
     [Flags]
     private enum TestEnumFlags
     {

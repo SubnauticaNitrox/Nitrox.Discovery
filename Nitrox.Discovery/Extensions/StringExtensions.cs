@@ -41,7 +41,7 @@ internal static class StringExtensions
         }
     }
 
-    public static string ReplaceInvalidFileNameChars(this string fileName, string replacement = "_")
+    public static string ReplaceInvalidFileNameChars(this string fileName, string replacement = "")
     {
         if (fileName == null)
         {

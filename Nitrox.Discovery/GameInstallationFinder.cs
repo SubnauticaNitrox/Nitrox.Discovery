@@ -39,12 +39,6 @@ public sealed class GameInstallationFinder
     /// <returns>Positive and negative results from the search</returns>
     public IEnumerable<FinderResult> FindGame(FindGameInfo input, GameLibraries gameLibraries = GameLibraries.ALL)
     {
-        Debug.Assert(input is not null);
-        if (input is null || !gameLibraries.IsDefined())
-        {
-            return [];
-        }
-
         return FindGame(input, gameLibraries.GetUniqueNonCombinatoryFlags());
     }
 
@@ -57,9 +51,9 @@ public sealed class GameInstallationFinder
             yield break;
         }
 
-        foreach (GameLibraries wantedFinder in gameLibraries)
+        foreach (GameLibraries library in gameLibraries)
         {
-            if (!finders.TryGetValue(wantedFinder, out IGameFinder finder))
+            if (!finders.TryGetValue(library, out IGameFinder finder))
             {
                 continue;
             }
@@ -81,14 +75,14 @@ public sealed class GameInstallationFinder
                     continue;
                 }
 
-                result = item with { Origin = wantedFinder, Path = PrettifyPath(item.Path!) };
+                result = item with { Origin = library, Path = PrettifyPath(item.Path!) };
                 break;
             }
 
             yield return result ?? new()
             {
                 FinderName = finder.GetType().Name,
-                Origin = wantedFinder,
+                Origin = library,
                 ErrorMessage = $"It appears you don't have {input.GameName} installed"
             };
         }
