@@ -17,6 +17,7 @@ namespace Nitrox.Discovery.InstallationFinders;
 public sealed class SteamFinder : IGameFinder
 {
     private static readonly Regex xcfPropertyLineRegex = new(@"""([^""]*)""\s*""([^""]*)""");
+    private static readonly string[] acfGameNameAndIdKeys = ["appid", "name"];
 
     public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo)
     {
@@ -56,9 +57,19 @@ public sealed class SteamFinder : IGameFinder
         {
             return -1;
         }
-        foreach (string acfFile in Directory.EnumerateFiles(rootDirectory, "appmanifest_*.acf", SearchOption.TopDirectoryOnly))
+        string[] acfFiles;
+        try
         {
-            Dictionary<string, string> props = ExtractPropertiesFromXcfFile(acfFile, tuple => tuple.key.ToLowerInvariant() is "appid" or "name").ToDictionary(t => t.key, t => t.value);
+            acfFiles = Directory.EnumerateFiles(rootDirectory, "appmanifest_*.acf", SearchOption.TopDirectoryOnly).ToArray();
+        }
+        catch (IOException)
+        {
+            return -1;
+        }
+
+        foreach (string acfFile in acfFiles)
+        {
+            Dictionary<string,string> props = ExtractPropertiesFromXcfFile(acfFile, acfGameNameAndIdKeys);
             if (!props.TryGetValue("name", out string extractedGameName) || !extractedGameName.Equals(gameName, StringComparison.OrdinalIgnoreCase))
             {
                 continue;
@@ -187,12 +198,15 @@ public sealed class SteamFinder : IGameFinder
         return null;
     }
 
-    private static IEnumerable<(string key, string value)> ExtractPropertiesFromXcfFile(string xcfFile,
-        Func<(string key, string value), bool> predicate)
+    /// <summary>
+    ///     Simplified acf/vdf file parser which extracts properties found. Only the first property key and their value is saved.
+    /// </summary>
+    private static Dictionary<string, string> ExtractPropertiesFromXcfFile(string xcfFile, params string[] keysToFind)
     {
         using StreamReader file = new(xcfFile);
         char[] trimChars = [' ', '\t'];
 
+        Dictionary<string, string> result = new();
         while (file.ReadLine() is { } line)
         {
             line = Regex.Unescape(line.Trim(trimChars));
@@ -200,10 +214,16 @@ public sealed class SteamFinder : IGameFinder
             string key = regMatch.Groups[1].Value;
             string value = regMatch.Groups[2].Value;
 
-            if (predicate((key, value)))
+            if (keysToFind.Length > 0 && keysToFind.Contains(key, StringComparer.InvariantCultureIgnoreCase))
             {
-                yield return (key, value);
+                key = key.ToLowerInvariant();
+                if (!result.ContainsKey(key))
+                {
+                    result[key] = value;
+                }
             }
         }
+
+        return result;
     }
 }
