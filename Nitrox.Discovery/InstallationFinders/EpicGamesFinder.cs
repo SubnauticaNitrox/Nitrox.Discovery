@@ -13,7 +13,7 @@ public sealed class EpicGamesFinder : IGameFinder
 {
     private static readonly Regex installLocationRegex = new("\"InstallLocation\"[^\"]*\"(.*)\"");
 
-    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(FindGameInfo input)
     {
         string commonAppFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
         string epicGamesManifestsDir = Path.Combine(commonAppFolder, "Epic", "EpicGamesLauncher", "Data", "Manifests");
@@ -29,7 +29,7 @@ public sealed class EpicGamesFinder : IGameFinder
             string fileText = File.ReadAllText(file);
             Match match = installLocationRegex.Match(fileText);
 
-            if (match.Success && match.Value.Contains(gameInfo.Name))
+            if (match.Success && match.Value.Contains(input.GameName))
             {
                 yield return Path.GetFullPath(match.Groups[1].Value);
             }

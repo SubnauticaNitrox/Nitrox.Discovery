@@ -11,11 +11,11 @@ namespace Nitrox.Discovery.InstallationFinders;
 /// </summary>
 public sealed class DiscordFinder : IGameFinder
 {
-    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(FindGameInfo input)
     {
         string localAppdataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-        yield return Path.Combine(localAppdataDirectory, "DiscordGames", gameInfo.Name, "content");
-        yield return Path.Combine("C:\\", "Games", gameInfo.Name, "content");
+        yield return Path.Combine(localAppdataDirectory, "DiscordGames", input.GameName, "content");
+        yield return Path.Combine("C:\\", "Games", input.GameName, "content");
     }
 }

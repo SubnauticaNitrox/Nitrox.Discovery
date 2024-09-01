@@ -34,25 +34,25 @@ public sealed class GameInstallationFinder
     /// <summary>
     ///     Searches for the game install directory given its <see cref="FindGameInfo" />.
     /// </summary>
-    /// <param name="gameInfo">Info object of a game.</param>
+    /// <param name="input">Input data containing game name to find.</param>
     /// <param name="gameLibraries">Known game libraries to search through</param>
     /// <returns>Positive and negative results from the search</returns>
-    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo, GameLibraries gameLibraries = GameLibraries.ALL)
+    public IEnumerable<FinderResult> FindGame(FindGameInfo input, GameLibraries gameLibraries = GameLibraries.ALL)
     {
-        Debug.Assert(gameInfo is not null);
-        if (gameInfo is null || !gameLibraries.IsDefined())
+        Debug.Assert(input is not null);
+        if (input is null || !gameLibraries.IsDefined())
         {
             return [];
         }
 
-        return FindGame(gameInfo, gameLibraries.GetUniqueNonCombinatoryFlags());
+        return FindGame(input, gameLibraries.GetUniqueNonCombinatoryFlags());
     }
 
     /// <inheritdoc cref="FindGame(Nitrox.Discovery.FindGameInfo,Nitrox.Discovery.Models.GameLibraries)" />
-    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo, IEnumerable<GameLibraries> gameLibraries)
+    public IEnumerable<FinderResult> FindGame(FindGameInfo input, IEnumerable<GameLibraries> gameLibraries)
     {
-        Debug.Assert(gameInfo is not null);
-        if (gameInfo is null || gameLibraries is null)
+        Debug.Assert(input is not null);
+        if (input is null || gameLibraries is null)
         {
             yield break;
         }
@@ -64,39 +64,33 @@ public sealed class GameInstallationFinder
                 continue;
             }
 
-            bool finderHasResult = false;
-            foreach (FinderResult item in finder.FindGame(gameInfo))
+            FinderResult result = null;
+            foreach (FinderResult item in finder.FindGame(input))
             {
                 if (item is null)
                 {
                     continue;
                 }
-                FinderResult result = item;
-                if (result.ErrorMessage is not null)
+                if (item.ErrorMessage is not null)
                 {
-                    yield return result;
-                    finderHasResult = true;
+                    result = item;
                     break;
                 }
-                if (!PathHasExecutable(result.Path, gameInfo.ExeName, gameInfo.ExeSearchDepth))
+                if (!PathHasExecutable(item.Path, input.ExeName, input.ExeSearchDepth))
                 {
                     continue;
                 }
 
-                finderHasResult = true;
-                yield return result with { Origin = wantedFinder, Path = PrettifyPath(result.Path!) };
+                result = item with { Origin = wantedFinder, Path = PrettifyPath(item.Path!) };
                 break;
             }
 
-            if (!finderHasResult)
+            yield return result ?? new()
             {
-                yield return new()
-                {
-                    FinderName = finder.GetType().Name,
-                    Origin = wantedFinder,
-                    ErrorMessage = $"It appears you don't have {gameInfo.Name} installed"
-                };
-            }
+                FinderName = finder.GetType().Name,
+                Origin = wantedFinder,
+                ErrorMessage = $"It appears you don't have {input.GameName} installed"
+            };
         }
     }
 

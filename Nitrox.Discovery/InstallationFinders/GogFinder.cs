@@ -12,7 +12,7 @@ public sealed class GogFinder : IGameFinder
 {
     private const string GogGamesInRegistry = @"Computer\HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\GOG.com\Games";
 
-    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(FindGameInfo input)
     {
         // TODO: Add support for non-windows.
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -23,11 +23,11 @@ public sealed class GogFinder : IGameFinder
         foreach (string gameId in RegistryEx.GetSubKeyNames(GogGamesInRegistry))
         {
             string gamePath = RegistryEx.Read<string>(Path.Combine(GogGamesInRegistry, gameId, "path"));
-            if (Path.GetFileName(gamePath) == gameInfo.Name)
+            if (Path.GetFileName(gamePath) == input.GameName)
             {
                 yield return gamePath;
             }
-            else if (RegistryEx.Read<string>(Path.Combine(GogGamesInRegistry, gameId, "gameName")) == gameInfo.Name)
+            else if (RegistryEx.Read<string>(Path.Combine(GogGamesInRegistry, gameId, "gameName")) == input.GameName)
             {
                 yield return gamePath;
             }

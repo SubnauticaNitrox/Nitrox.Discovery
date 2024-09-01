@@ -18,8 +18,9 @@ public sealed class SteamFinder : IGameFinder
 {
     private static readonly Regex xcfPropertyLineRegex = new(@"""([^""]*)""\s*""([^""]*)""");
     private static readonly string[] acfGameNameAndIdKeys = ["appid", "name"];
+    private static readonly char[] acfLineTrimCharacters = [' ', '\t'];
 
-    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(FindGameInfo input)
     {
         string steamPath = GetSteamPath();
         if (string.IsNullOrEmpty(steamPath))
@@ -28,16 +29,16 @@ public sealed class SteamFinder : IGameFinder
         }
 
         string appsPath = Path.Combine(steamPath, "steamapps");
-        int steamAppId = GetSteamAppIdFromAcfFileMatchingGameName(appsPath, gameInfo.Name);
+        int steamAppId = GetSteamAppIdFromAcfFileMatchingGameName(appsPath, input.GameName);
 
         string path;
         if (File.Exists(Path.Combine(appsPath, $"appmanifest_{steamAppId}.acf")))
         {
-            path = Path.Combine(appsPath, "common", gameInfo.Name);
+            path = Path.Combine(appsPath, "common", input.GameName);
         }
         else
         {
-            path = SearchAllInstallations(Path.Combine(appsPath, "libraryfolders.vdf"), gameInfo.Name);
+            path = SearchAllInstallations(Path.Combine(appsPath, "libraryfolders.vdf"), input.GameName);
             if (string.IsNullOrWhiteSpace(path))
             {
                 yield break;
@@ -46,7 +47,7 @@ public sealed class SteamFinder : IGameFinder
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            path = Path.Combine(path, $"{gameInfo.Name}.app", "Contents");
+            path = Path.Combine(path, $"{input.GameName}.app", "Contents");
         }
         yield return path;
     }
@@ -203,27 +204,48 @@ public sealed class SteamFinder : IGameFinder
     /// </summary>
     private static Dictionary<string, string> ExtractPropertiesFromXcfFile(string xcfFile, params string[] keysToFind)
     {
-        using StreamReader file = new(xcfFile);
-        char[] trimChars = [' ', '\t'];
-
-        Dictionary<string, string> result = new();
-        while (file.ReadLine() is { } line)
+        try
         {
-            line = Regex.Unescape(line.Trim(trimChars));
-            Match regMatch = xcfPropertyLineRegex.Match(line);
-            string key = regMatch.Groups[1].Value;
-            string value = regMatch.Groups[2].Value;
+            using StreamReader file = new(xcfFile);
 
-            if (keysToFind.Length > 0 && keysToFind.Contains(key, StringComparer.InvariantCultureIgnoreCase))
+            int keysToFindCount = keysToFind.Length;
+            Dictionary<string, string> result = [];
+            while (file.ReadLine() is { } line)
             {
+                line = Regex.Unescape(line.Trim(acfLineTrimCharacters));
+                Match regMatch = xcfPropertyLineRegex.Match(line);
+                string key = regMatch.Groups[1].Value;
+                string value = regMatch.Groups[2].Value;
+
+                if (keysToFind.Length > 0)
+                {
+                    if (!keysToFind.Contains(key, StringComparer.InvariantCultureIgnoreCase))
+                    {
+                        continue;
+                    }
+                    keysToFindCount--;
+                }
+
+                // Add key & value to result.
                 key = key.ToLowerInvariant();
                 if (!result.ContainsKey(key))
                 {
                     result[key] = value;
                 }
-            }
-        }
 
-        return result;
+                if (keysToFind.Length > 0)
+                {
+                    if (keysToFindCount < 1)
+                    {
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+        catch (IOException)
+        {
+            return [];
+        }
     }
 }

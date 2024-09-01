@@ -10,7 +10,7 @@ namespace Nitrox.Discovery.InstallationFinders;
 /// </summary>
 public sealed class MicrosoftFinder : IGameFinder
 {
-    public IEnumerable<FinderResult> FindGame(FindGameInfo gameInfo)
+    public IEnumerable<FinderResult> FindGame(FindGameInfo input)
     {
         string[] logicalDrives = [];
         try
@@ -25,8 +25,8 @@ public sealed class MicrosoftFinder : IGameFinder
 
         foreach (string logicalDrive in logicalDrives)
         {
-            yield return Path.Combine(logicalDrive, "XboxGames", gameInfo.Name, "Content");
+            yield return Path.Combine(logicalDrive, "XboxGames", input.GameName, "Content");
         }
-        yield return Path.Combine("C:\\", "XboxGames", gameInfo.Name, "Content");
+        yield return Path.Combine("C:\\", "XboxGames", input.GameName, "Content");
     }
 }

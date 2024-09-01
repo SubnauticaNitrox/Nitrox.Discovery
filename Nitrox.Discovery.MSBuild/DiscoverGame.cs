@@ -92,7 +92,7 @@ public class DiscoverGame : Task
         }
         FinderResult finderResult = GameInstallationFinder.Instance.FindGame(new()
         {
-            Name = GameName,
+            GameName = GameName,
             ExeName = ExeName ?? "",
             ExeSearchDepth = Math.Max(0, ExeSearchDepth)
         }, libraries).FirstOrDefault(r => string.IsNullOrWhiteSpace(r.ErrorMessage) && !string.IsNullOrWhiteSpace(r.Path));
