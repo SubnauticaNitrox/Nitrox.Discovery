@@ -33,7 +33,7 @@ internal static class StringExtensions
     {
         switch (Path.GetExtension(pathToFile)?.ToLowerInvariant())
         {
-            case ".exe" or ".com" when RuntimeInformation.IsOSPlatform(OSPlatform.Windows):
+            case ".exe": // also used on non-windows when running non-native programs.
             case ".so" or ".o" or null when RuntimeInformation.IsOSPlatform(OSPlatform.Linux):
                 return File.Exists(pathToFile);
             default:
