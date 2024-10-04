@@ -48,7 +48,6 @@ public sealed class SteamFinder : IGameFinder
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            yield return Path.Combine(path, $"{installDir}.app", "Contents");
             path = Path.Combine(path, $"{installDir}.app", "Contents");
         }
         yield return path;
