@@ -7,7 +7,7 @@ namespace Nitrox.Discovery.Extensions;
 internal static class StringExtensions
 {
     /// <summary>
-    ///     Gets the relative distance between two paths where the first parameter is a subdirectory of the basePah.
+    ///     Gets the relative distance between two paths where the first parameter is a subdirectory of the basePath.
     /// </summary>
     /// <returns>-1 if basePath is not the base, or a positive number if path is a subdirectory to basePath.</returns>
     public static int GetPathDepth(this string path, string basePath)

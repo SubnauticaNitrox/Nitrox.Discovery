@@ -69,7 +69,6 @@ public class DiscoverGame : Task
             return true;
         }
 
-        // Refresh cache
         IEnumerable<GameLibraries> libraries;
         if (IncludeLibraries is [] or null)
         {
