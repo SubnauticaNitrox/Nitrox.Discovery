@@ -2,7 +2,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/Nitrox.Discovery.MSBuild?label=Nitrox.Discovery.MSBuild&logo=NuGet)](https://www.nuget.org/packages/Nitrox.Discovery.MSBuild)
 
-Discovers the path to an installed game from a given game name.
+Discovers the path to an installed game from a given game name. Supports the most popular game stores and on both Windows and Linux.
 
 ### Use with MSBuild (minimized setup)
 
