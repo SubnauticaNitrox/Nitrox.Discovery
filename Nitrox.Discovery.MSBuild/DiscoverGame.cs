@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Nitrox.Discovery.Extensions;
@@ -26,9 +27,12 @@ public class DiscoverGame : Task
     public string ExeName { get; set; } = "";
 
     /// <summary>
-    ///     Relative depth to search within the game root for the game executable.
+    ///     Relative depth to search within the game root for the game executable. Default is 0 unless on OSX, then 1.
     /// </summary>
-    public int ExeSearchDepth { get; set; } = 0;
+    /// <remarks>
+    ///     As OSX has different file structure (.app/Contents/MacOS or .app/Contents/Resources, the default is 1).
+    /// </remarks>
+    public int ExeSearchDepth { get; set; } = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? 1 : 0;
 
     /// <summary>
     ///     Specifies the libraries to include in the search. The search will start in the same order as given.
@@ -129,8 +133,5 @@ public class DiscoverGame : Task
         }
     }
 
-    private string GetGameNameCacheFileName()
-    {
-        return Path.Combine(IntermediateOutputPath, DiscoverGameCacheFolderName, Path.ChangeExtension(GameName.ReplaceCommonInvalidFileNameChars(), "cache"));
-    }
+    private string GetGameNameCacheFileName() => Path.Combine(IntermediateOutputPath, DiscoverGameCacheFolderName, Path.ChangeExtension(GameName.ReplaceCommonInvalidFileNameChars(), "cache"));
 }
