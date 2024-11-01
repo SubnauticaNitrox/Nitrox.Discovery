@@ -31,13 +31,33 @@ internal static class StringExtensions
 
     public static bool IsExecutableFile(this string pathToFile)
     {
-        switch (Path.GetExtension(pathToFile)?.ToLowerInvariant())
+        try
         {
-            case ".exe": // also used on non-windows when running non-native programs.
-            case ".so" or ".o" or null when RuntimeInformation.IsOSPlatform(OSPlatform.Linux):
-                return File.Exists(pathToFile);
-            default:
-                return false;
+            using BinaryReader fs = new(File.OpenRead(pathToFile));
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase))
+            {
+                // MZ (ASCII)
+                return fs.ReadUInt16() is 0x5A4D;
+            }
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                // 7F + ELF (ASCII)
+                return fs.ReadUInt32() is 0x7F454C46;
+            }
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                // Either 32bit or 64bit program respectively
+                return fs.ReadUInt32() is 0xFEEDFACE or 0xFEEDFACF;
+            }
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
+        catch (IOException)
+        {
+            return false;
         }
     }
 
