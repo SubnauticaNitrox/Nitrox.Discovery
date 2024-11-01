@@ -30,12 +30,12 @@ public sealed class SteamFinder : IGameFinder
         }
 
         string appsPath = Path.Combine(steamPath, "steamapps");
-        (int steamAppId, string installDir) = GetSteamGameIdAndInstallDirFromAcfFiles(appsPath, input);
+        (int steamAppId, string gameFolderName) = GetSteamGameIdAndInstallDirFromAcfFiles(appsPath, input);
 
         string path;
         if (File.Exists(Path.Combine(appsPath, $"appmanifest_{steamAppId}.acf")))
         {
-            path = Path.Combine(appsPath, "common", installDir);
+            path = Path.Combine(appsPath, "common", gameFolderName);
         }
         else
         {
@@ -48,7 +48,7 @@ public sealed class SteamFinder : IGameFinder
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
-            path = Path.Combine(path, $"{installDir}.app", "Contents");
+            path = Path.Combine(path, $"{gameFolderName}.app", "Contents");
         }
         yield return path;
     }
