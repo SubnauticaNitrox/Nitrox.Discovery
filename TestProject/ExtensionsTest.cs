@@ -23,8 +23,8 @@ public class ExtensionsTest
     [TestMethod]
     public void InvalidFileName()
     {
-        "Subnautica: Below Zero".ReplaceInvalidFileNameChars().Should().Be("Subnautica Below Zero");
-        "Subnautica: Below Zero".ReplaceInvalidFileNameChars("_").Should().Be("Subnautica_ Below Zero");
+        "Subnautica: Below Zero".ReplaceCommonInvalidFileNameChars().Should().Be("Subnautica Below Zero");
+        "Subnautica: Below Zero".ReplaceCommonInvalidFileNameChars("_").Should().Be("Subnautica_ Below Zero");
     }
 
     [Flags]

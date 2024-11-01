@@ -41,12 +41,15 @@ internal static class StringExtensions
         }
     }
 
-    public static string ReplaceInvalidFileNameChars(this string fileName, string replacement = "")
+    /// <summary>
+    ///     Replaces common invalid file name characters. On Linux, only 2 characters are invalid, but we use Windows standard as it's more popular.
+    /// </summary>
+    public static string ReplaceCommonInvalidFileNameChars(this string fileName, string replacement = "")
     {
         if (fileName == null)
         {
             throw new ArgumentNullException(nameof(fileName));
         }
-        return string.Join(replacement, fileName.Split(Path.GetInvalidFileNameChars()));
+        return string.Join(replacement, fileName.Split('<', '>', '"', '/', '\\', '|', '?', '*', ':', (char)47));
     }
 }

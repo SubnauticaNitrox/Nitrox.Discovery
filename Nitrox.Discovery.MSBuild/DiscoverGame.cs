@@ -131,6 +131,6 @@ public class DiscoverGame : Task
 
     private string GetGameNameCacheFileName()
     {
-        return Path.Combine(IntermediateOutputPath, DiscoverGameCacheFolderName, Path.ChangeExtension(GameName.ReplaceInvalidFileNameChars(), "cache"));
+        return Path.Combine(IntermediateOutputPath, DiscoverGameCacheFolderName, Path.ChangeExtension(GameName.ReplaceCommonInvalidFileNameChars(), "cache"));
     }
 }

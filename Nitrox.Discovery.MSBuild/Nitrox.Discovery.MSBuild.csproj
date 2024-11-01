@@ -27,7 +27,7 @@
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.*" PrivateAssets="all" ExcludeAssets="Runtime"/>
         <ProjectReference Include="..\Nitrox.Discovery\Nitrox.Discovery.csproj"/>
 
-        <PackageReference Include="PolySharp" Version="1.13.1" PrivateAssets="all"/>
+        <PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
