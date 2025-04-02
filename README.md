@@ -25,6 +25,10 @@ Discovers the path to an installed game from a given game name. Supports the mos
 > [!IMPORTANT]
 > `Condition="'$(_NitroxDiscovery_TaskAssembly)' != ''"` is needed so Visual Studio can still load Nuget packages without requiring `DiscoverGame` task to exist!
 
+#### These options are available for `DiscoverGame` task
+
+https://github.com/SubnauticaNitrox/Nitrox.Discovery/blob/7c018aa3fd9f05ad012fe91ccb8a535ffbd5b2c5/Nitrox.Discovery.MSBuild/DiscoverGame.cs#L21-L47
+
 ### Recommended setup
 
 ```xml
