@@ -6,7 +6,8 @@
 
         <Description>Finds the path to an installed game from its name</Description>
 
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <!-- TODO: Disabled until ready for deployment -->
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 
         <RootNamespace>Nitrox.Discovery</RootNamespace>
     </PropertyGroup>

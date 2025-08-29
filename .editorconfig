@@ -99,7 +99,7 @@ resharper_web_config_wrong_module_highlighting = warning
 resharper_entity_framework_n_plus_one_incomplete_data_query_highlighting = none
 resharper_entity_framework_n_plus_one_incomplete_data_usage_highlighting = none
 
-[{*.har,*.jsb2,*.jsb3,*.json,.babelrc,.eslintrc,.stylelintrc,bowerrc,jest.config}]
+[{*.yml,*.har,*.jsb2,*.jsb3,*.json,.babelrc,.eslintrc,.stylelintrc,bowerrc,jest.config}]
 indent_style = space
 indent_size = 2
 
