@@ -37,17 +37,17 @@ internal static class StringExtensions
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase))
             {
                 // MZ (ASCII)
-                return fs.ReadUInt16() is 0x5A4D;
+                return fs.ReadBytes(2) is [0x4D, 0x5A];
             }
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 // 7F + ELF (ASCII)
-                return fs.ReadUInt32() is 0x7F454C46;
+                return fs.ReadBytes(4) is [0x7F, 0x45, 0x4C, 0x46];
             }
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 // Either 32bit or 64bit program respectively
-                return fs.ReadUInt32() is 0xFEEDFACE or 0xFEEDFACF;
+                return fs.ReadBytes(4) is [0xFE, 0xED, 0xFA, 0xCE] or [0xFE, 0xED, 0xFA, 0xCF];
             }
             return false;
         }
