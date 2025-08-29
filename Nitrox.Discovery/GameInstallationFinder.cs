@@ -107,11 +107,11 @@ public sealed class GameInstallationFinder
         try
         {
             executableNameOrEmpty = Path.GetFileNameWithoutExtension(executableNameOrEmpty);
-            foreach (string entry in Directory.EnumerateFileSystemEntries(directory, "*", SearchOption.AllDirectories))
+            foreach (string entry in Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories))
             {
                 if (entry.GetPathDepth(directory!) - 1 > maxDepth)
                 {
-                    // "EnumerateFileSystemEntries" will do breath-first-search so we can break as soon as we hit depth limit.
+                    // "EnumerateFiles" will do breath-first-search so we can break as soon as we hit depth limit.
                     break;
                 }
                 if ((extension != "" && !Path.GetExtension(entry).Equals(extension, StringComparison.OrdinalIgnoreCase)) || !entry.IsExecutableFile())
