@@ -15,7 +15,7 @@ public sealed class GogFinder : IGameFinder
     public IEnumerable<FinderResult> FindGame(FindGameInfo input)
     {
         // TODO: Add support for non-windows.
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (!IsOSPlatform(OSPlatform.Windows))
         {
             yield break;
         }

@@ -12,7 +12,7 @@ internal static class StringExtensions
     /// <returns>-1 if basePath is not the base, or a positive number if path is a subdirectory to basePath.</returns>
     public static int GetPathDepth(this string path, string basePath)
     {
-        StringComparison comparison = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        StringComparison comparison = IsOSPlatform(OSPlatform.Windows) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         path = Path.GetFullPath(path);
         basePath = Path.GetFullPath(basePath);
         if (!path.StartsWith(basePath, comparison))
@@ -34,22 +34,16 @@ internal static class StringExtensions
         try
         {
             using BinaryReader fs = new(File.OpenRead(pathToFile));
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase))
+            return fs.ReadBytes(4) switch
             {
                 // MZ (ASCII)
-                return fs.ReadBytes(2) is [0x4D, 0x5A];
-            }
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
+                [0x4D, 0x5A, ..] when IsOSPlatform(OSPlatform.Windows) || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase) => true,
                 // 7F + ELF (ASCII)
-                return fs.ReadBytes(4) is [0x7F, 0x45, 0x4C, 0x46];
-            }
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
+                [0x7F, 0x45, 0x4C, 0x46] when IsOSPlatform(OSPlatform.Linux) => true,
                 // Either 32bit or 64bit program respectively
-                return fs.ReadBytes(4) is [0xFE, 0xED, 0xFA, 0xCE] or [0xFE, 0xED, 0xFA, 0xCF];
-            }
-            return false;
+                [0xFE, 0xED, 0xFA, 0xCE] or [0xFE, 0xED, 0xFA, 0xCF] when IsOSPlatform(OSPlatform.OSX) => true,
+                _ => false
+            };
         }
         catch (UnauthorizedAccessException)
         {

@@ -46,7 +46,7 @@ public sealed class SteamFinder : IGameFinder
             }
         }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        if (IsOSPlatform(OSPlatform.OSX))
         {
             path = Path.Combine(path, $"{gameFolderName}.app", "Contents");
         }
@@ -92,7 +92,7 @@ public sealed class SteamFinder : IGameFinder
 
     private static string GetSteamPath()
     {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (IsOSPlatform(OSPlatform.Windows))
         {
             string steamPath = RegistryEx.Read<string>(@"Software\Valve\Steam\SteamPath");
 
@@ -106,7 +106,7 @@ public sealed class SteamFinder : IGameFinder
 
             return Directory.Exists(steamPath) ? steamPath : null;
         }
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        if (IsOSPlatform(OSPlatform.Linux))
         {
             string homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             if (string.IsNullOrWhiteSpace(homePath))
@@ -144,7 +144,7 @@ public sealed class SteamFinder : IGameFinder
 
             return null;
         }
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        if (IsOSPlatform(OSPlatform.OSX))
         {
             string homePath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             if (string.IsNullOrWhiteSpace(homePath))

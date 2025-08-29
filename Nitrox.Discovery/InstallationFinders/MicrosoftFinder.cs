@@ -13,7 +13,7 @@ public sealed class MicrosoftFinder : IGameFinder
 {
     public IEnumerable<FinderResult> FindGame(FindGameInfo input)
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (!IsOSPlatform(OSPlatform.Windows))
         {
             yield break;
         }
