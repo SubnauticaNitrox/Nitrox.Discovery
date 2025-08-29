@@ -12,7 +12,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="PolySharp" Version="1.13.1" PrivateAssets="all"/>
+        <PackageReference Include="PolySharp" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
     </ItemGroup>
 
     <!-- Conditional dependencies based on target framework -->
@@ -20,7 +20,7 @@
         <When Condition="'$(TargetFramework)' == 'netstandard2.0'">
             <ItemGroup>
                 <!-- netstandard windows registry throws PlatformNotSupported even on Windows so don't include in package, but we do need it for compile. -->
-                <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" PrivateAssets="all"/>
+                <PackageReference Include="Microsoft.Win32.Registry" PrivateAssets="all"/>
             </ItemGroup>
         </When>
     </Choose>

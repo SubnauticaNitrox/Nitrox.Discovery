@@ -10,16 +10,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="6.0.2">
+        <PackageReference Include="coverlet.collector">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="FluentAssertions" Version="6.12.1" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.6.2" />
-        <PackageReference Include="MSTest.TestFramework" Version="3.6.2" />
-        <PackageReference Include="NSubstitute" Version="5.3.0" />
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.1.1012" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="MSTest.TestAdapter" />
+        <PackageReference Include="MSTest.TestFramework" />
+        <PackageReference Include="NSubstitute" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" />
     </ItemGroup>
 
     <ItemGroup>
@@ -30,5 +30,4 @@
         <ProjectReference Include="..\Nitrox.Discovery.MSBuild\Nitrox.Discovery.MSBuild.csproj"/>
         <ProjectReference Include="..\Nitrox.Discovery\Nitrox.Discovery.csproj"/>
     </ItemGroup>
-
 </Project>
