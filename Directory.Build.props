@@ -2,6 +2,7 @@
     <PropertyGroup>
         <LangVersion>latest</LangVersion>
         <Nullable>disable</Nullable>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <Authors>Nitrox Team</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/SubnauticaNitrox/Nitrox.Discovery</RepositoryUrl>

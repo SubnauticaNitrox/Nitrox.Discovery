@@ -4,7 +4,6 @@
         <DebugType>embedded</DebugType>
         <Description>MSBuild integration for Nitrox.Discovery</Description>
 
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <DevelopmentDependency>true</DevelopmentDependency>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
