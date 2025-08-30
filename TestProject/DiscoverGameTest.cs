@@ -20,9 +20,11 @@ public class DiscoverGameTest
         buildEngine.When(x => x.LogErrorEvent(Arg.Any<BuildErrorEventArgs>())).Do(info => errors.Add(info.Arg<BuildErrorEventArgs>()));
     }
 
-    [TestMethod]
+    [NonCiTestMethod]
     public void TestExecute()
     {
+        // TODO: Allow this to run on CI systems.
+
         //Arrange
         DiscoverGame task = new()
         {
