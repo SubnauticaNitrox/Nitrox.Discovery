@@ -1,9 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
-        <LangVersion>latest</LangVersion>
         <DebugType>embedded</DebugType>
-
         <Description>MSBuild integration for Nitrox.Discovery</Description>
 
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -53,7 +51,7 @@
     <Target
         Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput"
         BeforeTargets="BuiltProjectOutputGroup"
-        Condition=" '$(GenerateDependencyFile)' == 'true'">
+        Condition="'$(GenerateDependencyFile)' == 'true'">
 
         <ItemGroup>
             <BuiltProjectOutputGroupOutput

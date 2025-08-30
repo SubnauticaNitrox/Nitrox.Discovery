@@ -1,14 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
-        <LangVersion>latest</LangVersion>
-        <Nullable>disable</Nullable>
-
         <Description>Finds the path to an installed game from its name</Description>
-
-        <!-- TODO: Disabled until ready for deployment -->
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-
+        <IsPackable>false</IsPackable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <RootNamespace>Nitrox.Discovery</RootNamespace>
     </PropertyGroup>
 
