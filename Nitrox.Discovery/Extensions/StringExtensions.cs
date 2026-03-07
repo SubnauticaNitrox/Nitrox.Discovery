@@ -40,7 +40,7 @@ internal static class StringExtensions
             if (IsOSPlatform(OSPlatform.Windows))
             {
                 // MZ (ASCII)
-                return header is [0x4D, 0x5A, ..];
+                return header is [0x4D, 0x5A, ..] || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase);
             }
             else if (IsOSPlatform(OSPlatform.Linux))
             {
