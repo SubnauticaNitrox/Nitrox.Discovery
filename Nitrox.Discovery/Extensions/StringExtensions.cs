@@ -31,16 +31,17 @@ internal static class StringExtensions
 
     public static bool IsExecutableFile(this string pathToFile)
     {
+        BinaryReader fs = null;
         try
         {
-            using BinaryReader fs = new(File.OpenRead(pathToFile));
-
+            fs = new(File.OpenRead(pathToFile));
             byte[] header = fs.ReadBytes(4);
 
-            if (IsOSPlatform(OSPlatform.Windows))
+            // Check for MZ even on non-Windows platforms because they could be used for Proton/Wine emulation.
+            if (IsOSPlatform(OSPlatform.Windows) || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase))
             {
                 // MZ (ASCII)
-                return header is [0x4D, 0x5A, ..] || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase);
+                return header is [0x4D, 0x5A, ..];
             }
             else if (IsOSPlatform(OSPlatform.Linux))
             {
@@ -49,18 +50,39 @@ internal static class StringExtensions
             }
             else if (IsOSPlatform(OSPlatform.OSX))
             {
-                // Mach-O 32bit (big-endian and little-endian)
-                return header is [0xFE, 0xED, 0xFA, 0xCE] or [0xCE, 0xFA, 0xED, 0xFE]
-                // Mach-O 64bit (big-endian and little-endian)
-                              or [0xFE, 0xED, 0xFA, 0xCF] or [0xCF, 0xFA, 0xED, 0xFE]
-                // Fat Mach-O 32bit (big-endian and little-endian)
-                              or [0xCA, 0xFE, 0xBA, 0xBE] or [0xBE, 0xBA, 0xFE, 0xCA]
-                // Fat Mach-O 64bit (big-endian and little-endian)
-                              or [0xCA, 0xFE, 0xBA, 0xBF] or [0xBF, 0xBA, 0xFE, 0xCA];
+                if (BitConverter.IsLittleEndian)
+                {
+                    return header switch
+                    {
+                        // Mach-O 32bit
+                        [0xCE, 0xFA, 0xED, 0xFE] => true,
+                        // Mach-O 64bit
+                        [0xCF, 0xFA, 0xED, 0xFE] => true,
+                        // Fat Mach-O 32bit
+                        [0xBE, 0xBA, 0xFE, 0xCA] => true,
+                        // Fat Mach-O 64bit
+                        [0xBF, 0xBA, 0xFE, 0xCA] => true,
+                        _ => false
+                    };
+                }
+                else
+                {
+                    return header switch
+                    {
+                        // Mach-O 32bit
+                        [0xFE, 0xED, 0xFA, 0xCE] => true,
+                        // Mach-O 64bit
+                        [0xFE, 0xED, 0xFA, 0xCF] => true,
+                        // Fat Mach-O 32bit
+                        [0xCA, 0xFE, 0xBA, 0xBE] => true,
+                        // Fat Mach-O 64bit
+                        [0xCA, 0xFE, 0xBA, 0xBF] => true,
+                        _ => false
+                    };
+                }
             }
 
-            // Fallback ?
-            return Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase);
+            return false;
         }
         catch (UnauthorizedAccessException)
         {
@@ -69,6 +91,10 @@ internal static class StringExtensions
         catch (IOException)
         {
             return false;
+        }
+        finally
+        {
+            fs?.Dispose();
         }
     }
 
