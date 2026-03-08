@@ -31,58 +31,11 @@ internal static class StringExtensions
 
     public static bool IsExecutableFile(this string pathToFile)
     {
-        BinaryReader fs = null;
+        byte[] header;
         try
         {
-            fs = new(File.OpenRead(pathToFile));
-            byte[] header = fs.ReadBytes(4);
-
-            // Check for MZ even on non-Windows platforms because they could be used for Proton/Wine emulation.
-            if (IsOSPlatform(OSPlatform.Windows) || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase))
-            {
-                // MZ (ASCII)
-                return header is [0x4D, 0x5A, ..];
-            }
-            else if (IsOSPlatform(OSPlatform.Linux))
-            {
-                // 7F + ELF (ASCII)
-                return header is [0x7F, 0x45, 0x4C, 0x46];
-            }
-            else if (IsOSPlatform(OSPlatform.OSX))
-            {
-                if (BitConverter.IsLittleEndian)
-                {
-                    return header switch
-                    {
-                        // Mach-O 32bit
-                        [0xCE, 0xFA, 0xED, 0xFE] => true,
-                        // Mach-O 64bit
-                        [0xCF, 0xFA, 0xED, 0xFE] => true,
-                        // Fat Mach-O 32bit
-                        [0xBE, 0xBA, 0xFE, 0xCA] => true,
-                        // Fat Mach-O 64bit
-                        [0xBF, 0xBA, 0xFE, 0xCA] => true,
-                        _ => false
-                    };
-                }
-                else
-                {
-                    return header switch
-                    {
-                        // Mach-O 32bit
-                        [0xFE, 0xED, 0xFA, 0xCE] => true,
-                        // Mach-O 64bit
-                        [0xFE, 0xED, 0xFA, 0xCF] => true,
-                        // Fat Mach-O 32bit
-                        [0xCA, 0xFE, 0xBA, 0xBE] => true,
-                        // Fat Mach-O 64bit
-                        [0xCA, 0xFE, 0xBA, 0xBF] => true,
-                        _ => false
-                    };
-                }
-            }
-
-            return false;
+            using BinaryReader fs = new(File.OpenRead(pathToFile));
+            header = fs.ReadBytes(4);
         }
         catch (UnauthorizedAccessException)
         {
@@ -92,10 +45,50 @@ internal static class StringExtensions
         {
             return false;
         }
-        finally
+
+        // Check for MZ even on non-Windows platforms because they could be used for Proton/Wine emulation.
+        if (IsOSPlatform(OSPlatform.Windows) || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase))
         {
-            fs?.Dispose();
+            // MZ (ASCII)
+            return header is [0x4D, 0x5A, ..];
         }
+        if (IsOSPlatform(OSPlatform.Linux))
+        {
+            // 7F + ELF (ASCII)
+            return header is [0x7F, 0x45, 0x4C, 0x46];
+        }
+        if (IsOSPlatform(OSPlatform.OSX))
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                return header switch
+                {
+                    // Mach-O 32bit
+                    [0xCE, 0xFA, 0xED, 0xFE] => true,
+                    // Mach-O 64bit
+                    [0xCF, 0xFA, 0xED, 0xFE] => true,
+                    // Fat Mach-O 32bit
+                    [0xBE, 0xBA, 0xFE, 0xCA] => true,
+                    // Fat Mach-O 64bit
+                    [0xBF, 0xBA, 0xFE, 0xCA] => true,
+                    _ => false
+                };
+            }
+            return header switch
+            {
+                // Mach-O 32bit
+                [0xFE, 0xED, 0xFA, 0xCE] => true,
+                // Mach-O 64bit
+                [0xFE, 0xED, 0xFA, 0xCF] => true,
+                // Fat Mach-O 32bit
+                [0xCA, 0xFE, 0xBA, 0xBE] => true,
+                // Fat Mach-O 64bit
+                [0xCA, 0xFE, 0xBA, 0xBF] => true,
+                _ => false
+            };
+        }
+
+        return false;
     }
 
     /// <summary>
