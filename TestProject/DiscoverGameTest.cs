@@ -16,7 +16,7 @@ public class DiscoverGameTest
     public void Startup()
     {
         buildEngine = Substitute.For<IBuildEngine>();
-        errors = new();
+        errors = [];
         buildEngine.When(x => x.LogErrorEvent(Arg.Any<BuildErrorEventArgs>())).Do(info => errors.Add(info.Arg<BuildErrorEventArgs>()));
     }
 

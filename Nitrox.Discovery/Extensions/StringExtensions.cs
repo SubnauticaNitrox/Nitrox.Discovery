@@ -31,19 +31,11 @@ internal static class StringExtensions
 
     public static bool IsExecutableFile(this string pathToFile)
     {
+        byte[] header;
         try
         {
             using BinaryReader fs = new(File.OpenRead(pathToFile));
-            return fs.ReadBytes(4) switch
-            {
-                // MZ (ASCII)
-                [0x4D, 0x5A, ..] when IsOSPlatform(OSPlatform.Windows) || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase) => true,
-                // 7F + ELF (ASCII)
-                [0x7F, 0x45, 0x4C, 0x46] when IsOSPlatform(OSPlatform.Linux) => true,
-                // Either 32bit or 64bit program respectively
-                [0xFE, 0xED, 0xFA, 0xCE] or [0xFE, 0xED, 0xFA, 0xCF] when IsOSPlatform(OSPlatform.OSX) => true,
-                _ => false
-            };
+            header = fs.ReadBytes(4);
         }
         catch (UnauthorizedAccessException)
         {
@@ -53,6 +45,50 @@ internal static class StringExtensions
         {
             return false;
         }
+
+        // Check for MZ even on non-Windows platforms because they could be used for Proton/Wine emulation.
+        if (IsOSPlatform(OSPlatform.Windows) || Path.GetExtension(pathToFile).Equals(".exe", StringComparison.OrdinalIgnoreCase))
+        {
+            // MZ (ASCII)
+            return header is [0x4D, 0x5A, ..];
+        }
+        if (IsOSPlatform(OSPlatform.Linux))
+        {
+            // 7F + ELF (ASCII)
+            return header is [0x7F, 0x45, 0x4C, 0x46];
+        }
+        if (IsOSPlatform(OSPlatform.OSX))
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                return header switch
+                {
+                    // Mach-O 32bit
+                    [0xCE, 0xFA, 0xED, 0xFE] => true,
+                    // Mach-O 64bit
+                    [0xCF, 0xFA, 0xED, 0xFE] => true,
+                    // Fat Mach-O 32bit
+                    [0xBE, 0xBA, 0xFE, 0xCA] => true,
+                    // Fat Mach-O 64bit
+                    [0xBF, 0xBA, 0xFE, 0xCA] => true,
+                    _ => false
+                };
+            }
+            return header switch
+            {
+                // Mach-O 32bit
+                [0xFE, 0xED, 0xFA, 0xCE] => true,
+                // Mach-O 64bit
+                [0xFE, 0xED, 0xFA, 0xCF] => true,
+                // Fat Mach-O 32bit
+                [0xCA, 0xFE, 0xBA, 0xBE] => true,
+                // Fat Mach-O 64bit
+                [0xCA, 0xFE, 0xBA, 0xBF] => true,
+                _ => false
+            };
+        }
+
+        return false;
     }
 
     /// <summary>
