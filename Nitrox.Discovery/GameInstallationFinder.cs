@@ -11,7 +11,7 @@ namespace Nitrox.Discovery;
 /// <summary>
 ///     Main game installation finder that will use all available methods of detection to find the game installation directory
 /// </summary>
-public sealed class GameInstallationFinder
+public sealed class GameInstallationFinder(Dictionary<GameLibraries, IGameFinder> finders)
 {
     private static readonly Lazy<GameInstallationFinder> instance = new(() => new(new()
     {
@@ -19,15 +19,11 @@ public sealed class GameInstallationFinder
         { GameLibraries.EPIC, new EpicGamesFinder() },
         { GameLibraries.DISCORD, new DiscordFinder() },
         { GameLibraries.MICROSOFT, new MicrosoftFinder() },
-        { GameLibraries.GOG, new GogFinder() }
+        { GameLibraries.GOG, new GogFinder() },
+        { GameLibraries.HEROIC, new HeroicGamesFinder() }
     }));
 
-    private readonly Dictionary<GameLibraries, IGameFinder> finders;
-
-    public GameInstallationFinder(Dictionary<GameLibraries, IGameFinder> finders)
-    {
-        this.finders = finders;
-    }
+    private readonly Dictionary<GameLibraries, IGameFinder> finders = finders;
 
     public static GameInstallationFinder Instance => instance.Value;
 
@@ -37,16 +33,16 @@ public sealed class GameInstallationFinder
     /// <param name="input">Input data containing game name to find.</param>
     /// <param name="gameLibraries">Known game libraries to search through</param>
     /// <returns>Positive and negative results from the search</returns>
-    public IEnumerable<FinderResult> FindGame(FindGameInfo input, GameLibraries gameLibraries = GameLibraries.ALL)
+    public IEnumerable<GameFinderResult> FindGame(FindGameInfo input, GameLibraries gameLibraries = GameLibraries.ALL)
     {
         return FindGame(input, gameLibraries.GetUniqueNonCombinatoryFlags());
     }
 
     /// <inheritdoc cref="FindGame(Nitrox.Discovery.FindGameInfo,Nitrox.Discovery.Models.GameLibraries)" />
-    public IEnumerable<FinderResult> FindGame(FindGameInfo input, IEnumerable<GameLibraries> gameLibraries)
+    public IEnumerable<GameFinderResult> FindGame(FindGameInfo input, IEnumerable<GameLibraries> gameLibraries)
     {
         Debug.Assert(input is not null);
-        if (input is null || gameLibraries is null)
+        if (input is null)
         {
             yield break;
         }
@@ -58,8 +54,8 @@ public sealed class GameInstallationFinder
                 continue;
             }
 
-            FinderResult result = null;
-            foreach (FinderResult item in finder.FindGame(input))
+            GameFinderResult? result = null;
+            foreach (GameFinderResult item in finder.FindGame(input))
             {
                 if (item is null)
                 {

@@ -28,9 +28,14 @@ public enum GameLibraries
     GOG = 1 << 3,
 
     /// <summary>
+    ///     Heroic Games Launcher
+    /// </summary>
+    HEROIC = 1 << 4,
+
+    /// <summary>
     ///     Discord game store
     /// </summary>
-    DISCORD = 1 << 4,
+    DISCORD = 1 << 5,
 
     /// <summary>
     ///     Commercial game platforms

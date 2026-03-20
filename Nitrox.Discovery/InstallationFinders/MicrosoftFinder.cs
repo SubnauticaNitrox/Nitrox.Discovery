@@ -11,7 +11,7 @@ namespace Nitrox.Discovery.InstallationFinders;
 /// </summary>
 public sealed class MicrosoftFinder : IGameFinder
 {
-    public IEnumerable<FinderResult> FindGame(FindGameInfo input)
+    public IEnumerable<GameFinderResult> FindGame(FindGameInfo input)
     {
         if (!IsOSPlatform(OSPlatform.Windows))
         {

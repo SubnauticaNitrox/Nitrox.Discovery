@@ -12,17 +12,15 @@ public sealed record FindGameInfo
 
     public int ExeSearchDepth { get; set; }
 
-    private string normalizedGameName;
-
     public string NormalizedGameName
     {
         get
         {
-            if (string.IsNullOrWhiteSpace(normalizedGameName))
+            if (string.IsNullOrWhiteSpace(field))
             {
-                normalizedGameName = NormalizeGameName(GameName);
+                field = NormalizeGameName(GameName);
             }
-            return normalizedGameName;
+            return field;
         }
     }
 

@@ -12,7 +12,7 @@ public sealed class GogFinder : IGameFinder
 {
     private const string GogGamesInRegistry = @"Computer\HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\GOG.com\Games";
 
-    public IEnumerable<FinderResult> FindGame(FindGameInfo input)
+    public IEnumerable<GameFinderResult> FindGame(FindGameInfo input)
     {
         // TODO: Add support for non-windows.
         if (!IsOSPlatform(OSPlatform.Windows))

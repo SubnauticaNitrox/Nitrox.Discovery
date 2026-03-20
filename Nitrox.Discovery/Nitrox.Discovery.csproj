@@ -4,10 +4,12 @@
         <Description>Finds the path to an installed game from its name</Description>
         <IsPackable>false</IsPackable>
         <RootNamespace>Nitrox.Discovery</RootNamespace>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="PolySharp" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers" />
+        <PackageReference Include="System.Text.Json" />
     </ItemGroup>
 
     <!-- Conditional dependencies based on target framework -->

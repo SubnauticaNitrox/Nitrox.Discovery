@@ -93,13 +93,13 @@ public class DiscoverGame : Task
                 .SelectMany(l => l.GameLibrary)
                 .Distinct();
         }
-        FinderResult finderResult = GameInstallationFinder.Instance.FindGame(new()
+        GameFinderResult gameFinderResult = GameInstallationFinder.Instance.FindGame(new()
         {
             GameName = GameName.Trim(),
             ExeName = ExeName ?? "",
             ExeSearchDepth = Math.Max(0, ExeSearchDepth)
         }, libraries).FirstOrDefault(r => string.IsNullOrWhiteSpace(r.ErrorMessage) && !string.IsNullOrWhiteSpace(r.Path));
-        GamePath = finderResult?.Path ?? "";
+        GamePath = gameFinderResult?.Path ?? "";
         StoreGamePath(GamePath);
 
         return true;

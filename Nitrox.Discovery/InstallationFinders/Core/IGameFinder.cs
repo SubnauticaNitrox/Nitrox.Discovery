@@ -9,5 +9,5 @@ public interface IGameFinder
     /// </summary>
     /// <param name="input">Game to search for.</param>
     /// <returns>Nullable game installation</returns>
-    IEnumerable<FinderResult> FindGame(FindGameInfo input);
+    IEnumerable<GameFinderResult> FindGame(FindGameInfo input);
 }

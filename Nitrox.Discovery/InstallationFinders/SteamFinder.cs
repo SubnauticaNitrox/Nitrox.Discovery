@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Nitrox.Discovery.InstallationFinders.Core;
-using static Nitrox.Discovery.InstallationFinders.Core.FinderResult;
+using static Nitrox.Discovery.InstallationFinders.Core.GameFinderResult;
 
 namespace Nitrox.Discovery.InstallationFinders;
 
@@ -20,7 +20,7 @@ public sealed class SteamFinder : IGameFinder
     private static readonly string[] acfGameInfoKeys = ["appid", "name", "installdir"];
     private static readonly char[] acfLineTrimCharacters = [' ', '\t'];
 
-    public IEnumerable<FinderResult> FindGame(FindGameInfo input)
+    public IEnumerable<GameFinderResult> FindGame(FindGameInfo input)
     {
         string steamPath = GetSteamPath();
         if (string.IsNullOrEmpty(steamPath))

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Nitrox.Discovery.Models;
@@ -25,7 +26,7 @@ public class DiscoverGameTest
     {
         // TODO: Allow this to run on CI systems.
 
-        //Arrange
+        // Arrange
         DiscoverGame task = new()
         {
             GameName = "Subnautica",
@@ -33,13 +34,13 @@ public class DiscoverGameTest
             BuildEngine = buildEngine
         };
 
-        //Act
+        // Act
         bool success = task.Execute();
 
-        //Assert
+        // Assert
         Assert.IsTrue(success);
         Assert.AreEqual(0, errors.Count);
         Assert.AreNotEqual("", task.GamePath);
-        Console.WriteLine(task.GamePath);
+        Debug.WriteLine(task.GamePath);
     }
 }

@@ -13,14 +13,14 @@ public sealed class EpicGamesFinder : IGameFinder
 {
     private static readonly Regex itemFilePropertyLineRegex = new(@"""([^""]*)"":\s*""([^""]*)""");
 
-    public IEnumerable<FinderResult> FindGame(FindGameInfo input)
+    public IEnumerable<GameFinderResult> FindGame(FindGameInfo input)
     {
         string commonAppFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
         string epicGamesManifestsDir = Path.Combine(commonAppFolder, "Epic", "EpicGamesLauncher", "Data", "Manifests");
 
         if (!Directory.Exists(epicGamesManifestsDir))
         {
-            yield return FinderResult.Error("Epic games manifest directory does not exist. Verify that Epic Games Store has been installed");
+            yield return GameFinderResult.Error("Epic games manifest directory does not exist. Verify that Epic Games Store has been installed");
         }
         string[] files;
         try
