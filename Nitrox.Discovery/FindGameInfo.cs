@@ -22,9 +22,9 @@ public sealed record FindGameInfo
             }
             return field;
         }
-    }
+    } = null!;
 
-    public bool IsSimilarGameName(string gameName)
+    public bool IsSimilarGameName(string? gameName)
     {
         if (gameName is null or "")
         {

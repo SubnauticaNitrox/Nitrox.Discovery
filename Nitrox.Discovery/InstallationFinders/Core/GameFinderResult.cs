@@ -33,5 +33,5 @@ public sealed record GameFinderResult
             Path = path
         };
 
-    public static implicit operator GameFinderResult(string path) => Ok(path);
+    public static implicit operator GameFinderResult(string? path) => string.IsNullOrWhiteSpace(path) ? Error("Game not found") : Ok(path!);
 }
