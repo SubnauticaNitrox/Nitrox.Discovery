@@ -58,7 +58,7 @@ public sealed class HeroicGamesFinder : IGameFinder
             {
                 continue;
             }
-            if (Path.GetFileName(installPath) != gameInfo.NormalizedGameName)
+            if (!gameInfo.IsSimilarGameName(Path.GetFileName(installPath)))
             {
                 continue;
             }
