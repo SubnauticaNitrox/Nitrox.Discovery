@@ -36,11 +36,11 @@ public class DiscoverGameTest
 
         // Act
         bool success = task.Execute();
+        Debug.WriteLine($"GamePath: '{task.GamePath}'");
 
         // Assert
         Assert.IsTrue(success);
         Assert.AreEqual(0, errors.Count);
         Assert.AreNotEqual("", task.GamePath);
-        Debug.WriteLine(task.GamePath);
     }
 }
