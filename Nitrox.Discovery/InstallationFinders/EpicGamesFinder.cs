@@ -52,7 +52,6 @@ public sealed class EpicGamesFinder : IGameFinder
 
             while (file.ReadLine() is { } line)
             {
-                line = Regex.Unescape(line);
                 Match regMatch = itemFilePropertyLineRegex.Match(line);
                 string key = regMatch.Groups[1].Value.ToLowerInvariant();
                 string value = regMatch.Groups[2].Value;

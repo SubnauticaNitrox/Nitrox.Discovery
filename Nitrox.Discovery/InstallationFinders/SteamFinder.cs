@@ -181,7 +181,7 @@ public sealed class SteamFinder : IGameFinder
 
         while (file.ReadLine() is { } line)
         {
-            line = Regex.Unescape(line.Trim(trimChars));
+            line = line.Trim(trimChars);
             Match regMatch = xcfPropertyLineRegex.Match(line);
             string key = regMatch.Groups[1].Value;
 
@@ -216,7 +216,7 @@ public sealed class SteamFinder : IGameFinder
             Dictionary<string, string> result = [];
             while (file.ReadLine() is { } line)
             {
-                line = Regex.Unescape(line.Trim(acfLineTrimCharacters));
+                line = line.Trim(acfLineTrimCharacters);
                 Match regMatch = xcfPropertyLineRegex.Match(line);
                 string key = regMatch.Groups[1].Value;
                 string value = regMatch.Groups[2].Value;
