@@ -71,7 +71,7 @@ public sealed class GameInstallationFinder(Dictionary<GameLibraries, IGameFinder
                     continue;
                 }
 
-                result = item with { Origin = library, Path = PrettifyPath(item.Path!) };
+                result = item with { Origin = library, Path = PrettifyPath(item.Path) };
                 break;
             }
 
