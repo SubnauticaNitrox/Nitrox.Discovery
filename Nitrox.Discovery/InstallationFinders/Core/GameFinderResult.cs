@@ -1,6 +1,6 @@
-using System;
 using System.Runtime.CompilerServices;
 using Nitrox.Discovery.Models;
+using static System.IO.Path;
 
 namespace Nitrox.Discovery.InstallationFinders.Core;
 
@@ -22,14 +22,14 @@ public sealed record GameFinderResult
     public static GameFinderResult Error(string message, [CallerFilePath] string callerCodeFile = "") =>
         new()
         {
-            FinderName = callerCodeFile[(callerCodeFile.LastIndexOf("\\", StringComparison.Ordinal) + 1)..^3],
+            FinderName = GetFileNameWithoutExtension(callerCodeFile),
             ErrorMessage = message
         };
 
     private static GameFinderResult Ok(string path, [CallerFilePath] string callerCodeFile = "") =>
         new()
         {
-            FinderName = callerCodeFile[(callerCodeFile.LastIndexOf("\\", StringComparison.Ordinal) + 1)..^3],
+            FinderName = GetFileNameWithoutExtension(callerCodeFile),
             Path = path
         };
 
